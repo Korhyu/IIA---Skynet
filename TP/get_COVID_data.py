@@ -11,17 +11,19 @@ respuesta = requests.get(url_paises)
 paises = respuesta.json()
 
 
-for pais in paises:
-    print(pais["Country"] + " " + pais["ISO2"])
+#Imprimo los paises disponibles
+for p in paises:
+    print(p["Country"] + " " + p["ISO2"])
 
 
-respuesta = requests.get(url_datos_totales+pais)
+respuesta = requests.get(url_datos_totales + pais)
 datos = respuesta.json()
 new = 0
 old = 0
 
+archivo = pais + "_COVID.csv"
 
-with open("ar_COVID.csv", "w") as file:
+with open(archivo, "w") as file:
     writer = csv.writer(file)
     names = ['Date', 'Confirmed','New', 'Recovered', 'Deaths', 'Active']
     writer = csv.DictWriter(file, fieldnames=names)
