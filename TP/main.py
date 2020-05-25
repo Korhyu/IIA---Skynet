@@ -10,6 +10,7 @@ import random as rd
 import numpy as np
 
 from clases import individuo
+from fun_jose import run_test
 
 
 poblacion_actual = []           #Lista con la poblacion actual 
@@ -51,18 +52,6 @@ def read_pop():
     print('read_pop')
     #Funcion que lee el archivo de la poblacion almacenada en el archivo
    
-    pass
-
-
-
-def run_test(param):
-    print('run_test')
-    #Funcion que corre los 5 parametros recividos como lista en el filtro DEWMA
-    #deve devolver la curva resultado del filtro
-    #este filtro debe recivir el vector de valores de contagio del COVID
-
-    #To do
-
     pass
 
 
