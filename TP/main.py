@@ -113,8 +113,13 @@ for fin in range(nGen):
     #Evaluacion de la salida del filtro
     eval_test(nGen)
     #Seleccion de individuos
-    pob_sel=select_ind()
-    print('select_ind',pob_sel)
+    
+    #llenando score provisorios----------------------------
+    for individuo in range(len(poblacion_actual)):
+        poblacion_actual[individuo].score=rd.randint(1,20);
+    #------------------------------------------------------
+    pob_sel=select_ind(poblacion_actual)
+    
     #cruza
     mate_ind()
     #mutacion
