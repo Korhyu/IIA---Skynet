@@ -11,6 +11,7 @@ import numpy as np
 
 from clases import individuo
 from fun_jose import run_test, plot_filtrados
+from fun_matias import select_ind
 
 
 poblacion_actual = []           #Lista con la poblacion actual 
@@ -79,14 +80,6 @@ def score_ind():
     pass
 
 
-def select_ind():
-    print('select_ind')
-    #Funcion que recorre la poblacion viendo los puntajes y los pasa a la proxima generacion
-    #hay que definir la cantidad de individuos por "promocion directa" y cuantos por "apareamiento"
-
-    pass
-
-
 def mate_ind():
     print('mate_ind')
     #Esta funcion deberia reccorer la poblacion actual e ir seleccionando los individuos a aparear
@@ -120,7 +113,8 @@ for fin in range(nGen):
     #Evaluacion de la salida del filtro
     eval_test(nGen)
     #Seleccion de individuos
-    select_ind()
+    pob_sel=select_ind()
+    print('select_ind',pob_sel)
     #cruza
     mate_ind()
     #mutacion
