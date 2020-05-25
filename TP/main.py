@@ -18,6 +18,7 @@ poblacion_actual = []           #Lista con la poblacion actual
 poblacion_nueva = []            #Lista donde se van volcando los individuos de la proxima poblacion
 
 
+# Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
 lim_N = [2, 40]
 lim_gamma = [0.1, 10]
 lim_alfa = [0.1, 10]
@@ -25,8 +26,17 @@ lim_Nmax = [40, 40]             #Hay que revisar estos limites porque el filtro 
 lim_Nmin = [2, 2]               #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 
 
+# Parametros del GA ----------------------------------------------------------------------------------------------------------------------
 nGen = 1                        #Generaciones a correr
 pDim = 20                       #Tamaño de la poblacion
+prob_mut = 0.05                 #Probabilidad de que un individuo mute
+indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
+
+
+
+
+
+# Funciones ------------------------------------------------------------------------------------------------------------------------------
 
 def param_rand():
     #Genera los parametros aleatorios y los devuelve en una lista
@@ -89,11 +99,24 @@ def mate_ind():
     pass
 
 
-def mutac_ind():
+
+def mutac_ind(poblacion):
     #Funcion que recorre la poblacion futura y genera la mutacion en los individuos
 
-    pass
-
+    for individuo in range(len(poblacion)):
+        for i in range(3):                          #Recorro los parametros de ese individuo para ver si mutan. Esta harcodeado el parametro maximo porque esta el tema del Nmax y Nmin
+            num = rd.uniform(0, 1)                  #Numero aleatorio para comprar contra la probabilidad de mutacion
+            if num <= prob_mut:
+                if indx_mut == 0:                   #Si el indice de mutacion es 0, busco un parametro nuevo
+                    param_mut = param_rand()        #Obtengo todos los parametros nuevos, mas facil que crear una funcion que me de 1 parametro especifico
+                    poblacion[individuo].param[i] = param_mut[i]
+                
+                else:                               #"Inercia" de mutacion
+                    param_mut = poblacion[individuo].param[i]
+                    if i == 0:                      #significa que estoy mutando el N y tiene que ser entero, realizo un redondeo
+                        param_mut = round(param_mut * (1 + indx_mut * rd.uniform(-1, 1)))
+                    else:
+                        param_mut = param_mut * (1 + indx_mut * rd.uniform(-1, 1))
 
 
 
@@ -118,12 +141,14 @@ for fin in range(nGen):
     for individuo in range(len(poblacion_actual)):
         poblacion_actual[individuo].score=rd.randint(1,20);
     #------------------------------------------------------
-    pob_sel=select_ind(poblacion_actual)
+    poblacion_nueva=select_ind(poblacion_actual)
     
     #cruza
     mate_ind()
     #mutacion
-    mutac_ind()
+    mutac_ind(poblacion_nueva)
+
+    poblacion_actual = poblacion_nueva.copy()
 
 #Termino y muestro resultados
 

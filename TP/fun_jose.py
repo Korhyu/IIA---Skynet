@@ -68,6 +68,10 @@ def run_test(param):
 
 
 
+
+
+
+
 def plot_filtrados(pobl):
     #Funcion auxiliar para ploteo de las salidas de toda la poblacion del filtro DEWMA
     plt.plot(load_data(), 'k--', label='Datos de contagio')

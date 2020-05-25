@@ -11,7 +11,7 @@ def select_ind(poblacion_actual):
     #pob_ord=sorted(poblacion_actual[].score);
     pob_ord=sorted(poblacion_actual, key=lambda individuo : individuo.score, reverse=True)
     #reparto los numeros y genero una nueva lista con los selecionados
-    pob_sel=poblacion_actual
+    pob_sel=poblacion_actual.copy()                                 #Si aca no haces el copy laburas siempre con la misma lista
     for individuo in range(int(len(poblacion_actual)/2)):
         pob_sel[individuo]=pob_ord[individuo];
     for individuo in range(int(len(poblacion_actual)/4)):
