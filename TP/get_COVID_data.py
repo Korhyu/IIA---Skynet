@@ -1,6 +1,7 @@
 import requests
 import csv
 
+pais = "ar"
 
 url_paises = "https://api.covid19api.com/countries"
 url_datos_totales = "https://api.covid19api.com/total/dayone/country/"
@@ -14,15 +15,21 @@ for pais in paises:
     print(pais["Country"] + " " + pais["ISO2"])
 
 
-respuesta = requests.get(url_datos_totales+"ar")
+respuesta = requests.get(url_datos_totales+pais)
 datos = respuesta.json()
+new = 0
+old = 0
+
 
 with open("ar_COVID.csv", "w") as file:
     writer = csv.writer(file)
-    fieldnames = ['Date', 'Confirmed','New', 'Recovered', 'Deaths']
-    writer = csv.DictWriter(file, fieldnames=fieldnames)
-    writer.writerow({'Date': fieldnames[0],'Confirmed': fieldnames[1], 'New': fieldnames[2],'Recovered': fieldnames[3],'Deaths': fieldnames[4]})
+    names = ['Date', 'Confirmed','New', 'Recovered', 'Deaths', 'Active']
+    writer = csv.DictWriter(file, fieldnames=names)
+    writer.writerow({names[0]: names[0],names[1]: names[1], names[2]: names[2],names[3]: names[3],names[4]: names[4], names[5]: names[5]})
 
 
     for dato in datos:
-        writer.writerow({'Date': dato["Date"],'Confirmed': dato["Confirmed"],'Recovered': dato["Recovered"],'Deaths': dato["Deaths"]})
+        new = dato["Confirmed"] - old
+        writer.writerow({names[0]: dato["Date"],names[1]: dato["Confirmed"],names[2]: new ,
+                        names[3]: dato["Recovered"],names[4]: dato["Deaths"], names[5]: dato["Active"]})
+        old = dato["Confirmed"]

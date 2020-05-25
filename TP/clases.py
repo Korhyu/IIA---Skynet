@@ -6,6 +6,9 @@ class individuo():
 
     #Puntaje del individuo
     score = 0
+
+    #Curva resultado del filtro
+    filtrada = []
     
     """ Alternativa
     # Para el caso del filtro por tratarse de 5 datos con nombre uso un diccionario para almacenar los valores
@@ -20,3 +23,6 @@ class individuo():
 
     def set_score(self, sc_ind):
         self.score = sc_ind
+
+    def get_filt(self, filtrada):
+        self.filtrada = filtrada.copy()

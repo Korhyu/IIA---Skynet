@@ -10,19 +10,22 @@ import random as rd
 import numpy as np
 
 from clases import individuo
-from fun_jose import run_test
+from fun_jose import run_test, plot_filtrados
 
 
 poblacion_actual = []           #Lista con la poblacion actual 
 poblacion_nueva = []            #Lista donde se van volcando los individuos de la proxima poblacion
 
 
-lim_N = [1, 30]
-lim_gamma = [1, 10]
-lim_alfa = [1, 10]
-lim_Nmax = [1, 10]              #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
-lim_Nmin = [1, 10]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
-nGen=1;
+lim_N = [2, 40]
+lim_gamma = [0.1, 10]
+lim_alfa = [0.1, 10]
+lim_Nmax = [40, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
+lim_Nmin = [2, 2]               #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
+
+
+nGen = 1                        #Generaciones a correr
+pDim = 20                       #Tamaño de la poblacion
 
 def param_rand():
     #Genera los parametros aleatorios y los devuelve en una lista
@@ -30,7 +33,7 @@ def param_rand():
 
     param[0] = rd.randint(lim_N[0], lim_N[1])               #Numeros enteros
     param[3] = rd.randint(lim_Nmax[0], lim_Nmax[1])
-    param[4] = rd.randint(lim_Nmax[0], lim_Nmax[1])
+    param[4] = rd.randint(lim_Nmin[0], lim_Nmin[1])
 
     param[1] = rd.uniform(lim_gamma[0], lim_gamma[1])       #Numeros con coma
     param[2] = rd.uniform(lim_alfa[0], lim_alfa[1])
@@ -98,21 +101,30 @@ def mutac_ind():
 
     pass
 
+
+
+
+
+
 print('Vamos a tomar',nGen,'generaciones')
-#tomar poblacion
-create_pop(10);
+create_pop(pDim)                                #Creo la poblacion aleatoria
 #read_pop();
 for fin in range(nGen):
+
     #aplicar  filtro a los tipitos
-    run_test(nGen);
+    for individuo in range(len(poblacion_actual)):
+        poblacion_actual[individuo].get_filt(run_test(poblacion_actual[individuo].param))
+
+    plot_filtrados(poblacion_actual)
+
     #Evaluacion de la salida del filtro
-    eval_test(nGen);
+    eval_test(nGen)
     #Seleccion de individuos
-    select_ind();
+    select_ind()
     #cruza
-    mate_ind();
+    mate_ind()
     #mutacion
-    mutac_ind();
+    mutac_ind()
 
 #Termino y muestro resultados
 
