@@ -26,15 +26,16 @@ poblacion_nueva = []            #Lista donde se van volcando los individuos de l
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
 lim_N = [2, 40]
-lim_gamma = [0.1, 10]
-lim_alfa = [0.1, 10]
-lim_Nmax = [40, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
-lim_Nmin = [2, 2]               #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
+lim_gamma = [1, 2]
+lim_alfa = [1, 2]
+lim_sigma = [1, 10]             #Actualmente no se utiliza y el filtro calcula su sigma propio
+lim_Nmax = [2, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
+lim_Nmin = [1, 39]               #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 500                      #Generaciones a correr
-pDim = 30                       #Tamaño de la poblacion
+nGen = 10                      #Generaciones a correr
+pDim = 20                      #Tamaño de la poblacion
 prob_mut = 0.05                 #Probabilidad de que un individuo mute
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
 
@@ -46,14 +47,18 @@ indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el v
 
 def param_rand():
     #Genera los parametros aleatorios y los devuelve en una lista
-    param = [0, 0, 0, 0, 0]
+    param = [0, 0, 0, 0, 0, 0]
 
     param[0] = rd.randint(lim_N[0], lim_N[1])               #Numeros enteros
-    param[3] = rd.randint(lim_Nmax[0], lim_Nmax[1])
-    param[4] = rd.randint(lim_Nmin[0], lim_Nmin[1])
+    param[4] = rd.randint(lim_Nmax[0], lim_Nmax[1])
+    param[5] = rd.randint(lim_Nmin[0], lim_Nmin[1])
 
     param[1] = rd.uniform(lim_gamma[0], lim_gamma[1])       #Numeros con coma
     param[2] = rd.uniform(lim_alfa[0], lim_alfa[1])
+    param[3] = rd.uniform(lim_sigma[0], lim_sigma[1])
+
+    if param[4] < param[5]:
+        param[5] = param[4] - 1
 
     return param
 
@@ -116,7 +121,7 @@ def mutac_ind(poblacion):
     #Funcion que recorre la poblacion futura y genera la mutacion en los individuos
 
     for individuo in range(len(poblacion)):
-        for i in range(3):                          #Recorro los parametros de ese individuo para ver si mutan. Esta harcodeado el parametro maximo porque esta el tema del Nmax y Nmin
+        for i in range(4):                          #Recorro los parametros de ese individuo para ver si mutan. Esta harcodeado el parametro maximo porque esta el tema del Nmax y Nmin
             num = rd.uniform(0, 1)                  #Numero aleatorio para comprar contra la probabilidad de mutacion
             if num <= prob_mut:
                 if indx_mut == 0:                   #Si el indice de mutacion es 0, busco un parametro nuevo
@@ -141,6 +146,7 @@ datos_orig = load_data()                        #Obtengo los datos de contagio
 evol_error = []
 
 for fin in range(nGen):
+    print('Generacion ',fin)
 
     error_minimo = 10000
     error_maximo = 0
@@ -169,7 +175,7 @@ for fin in range(nGen):
     evol_error.append(error_promedio)
 
 
-    #plot_filtrados(poblacion_actual)
+    plot_filtrados(poblacion_actual)
 
 
 
@@ -180,10 +186,10 @@ for fin in range(nGen):
 
 
     #Seleccion de individuos
-    poblacion_nueva=select_ind(poblacion_actual)
+    poblacion_nueva = select_ind(poblacion_actual)
     
     #cruza
-    mate_ind()
+    #mate_ind()
     #mutacion
     mutac_ind(poblacion_nueva)
 

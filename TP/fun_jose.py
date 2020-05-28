@@ -28,8 +28,9 @@ def FiltroDEWMA(param):
     N = param[0]
     gama = param[1]
     alfa = param[2]
-    Nmax = param[3]
-    Nmin = param[4]
+    sigma = param[3]
+    Nmax = param[4]
+    Nmin = param[5]
 
     variable = []
     variable = load_data()
@@ -53,7 +54,12 @@ def FiltroDEWMA(param):
         a = DEWMA[j-1] +(variable[j]-DEWMA[j-1])/N
         DEWMA = numpy.append( DEWMA , numpy.array(a))
 
-    return DEWMA
+    param[0] = N
+    param[1] = gama
+    param[2] = alfa
+    param[3] = sigma
+
+    return [DEWMA, param]
 
 
 

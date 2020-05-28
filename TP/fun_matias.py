@@ -11,15 +11,28 @@ def select_ind(poblacion_actual):
     #pob_ord=sorted(poblacion_actual[].score);
     pob_ord=sorted(poblacion_actual, key=lambda individuo : individuo.score, reverse=True)
     #reparto los numeros y genero una nueva lista con los selecionados
-    pob_sel=poblacion_actual.copy()                                 #Si aca no haces el copy laburas siempre con la misma lista
-    for individuo in range(int(len(poblacion_actual)/2)):
-        pob_sel[individuo]=pob_ord[individuo];
-    for individuo in range(int(len(poblacion_actual)/4)):
-        pob_sel[individuo+int(len(poblacion_actual)/2)]=pob_ord[individuo];   
-    for individuo in range(int(len(poblacion_actual)/6)):
-        pob_sel[individuo+int(len(poblacion_actual)/2)+int(len(poblacion_actual)/4)]=pob_ord[individuo];
-    for individuo in range(int(len(poblacion_actual)/8)):
-        pob_sel[individuo+int(len(poblacion_actual)/2)+int(len(poblacion_actual)/4)+int(len(poblacion_actual)/6)]=pob_ord[individuo];
+    pob_sel = []
+    for ind in range(int(len(poblacion_actual)/2)):
+        param = pob_ord[ind].get_param()
+        pob_sel.append(individuo(param))
+    for ind in range(int(len(poblacion_actual)/4)):
+        param = pob_ord[ind].get_param()
+        pob_sel.append(individuo(param))
+    for ind in range(int(len(poblacion_actual)/6)):
+        param = pob_ord[ind].get_param()
+        pob_sel.append(individuo(param))
+    for ind in range(int(len(poblacion_actual)/8)):
+        param = pob_ord[ind].get_param()
+        pob_sel.append(individuo(param))
+
+    if len(pob_sel) > len(pob_ord):
+        for elem in range(len(pob_sel) - len(pob_ord)):
+            pob_sel.pop()
     
+    if len(pob_sel) < len(pob_ord):
+        for elem in range(len(pob_ord) - len(pob_sel)):
+            param = pob_ord[ind].get_param()
+            pob_sel.append(individuo(param))
+
     #envio la lista pa la proxima etapa        
     return pob_sel
