@@ -8,14 +8,20 @@ Created on Sat May 23 12:36:53 2020
 
 import random as rd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from clases import individuo
-from fun_jose import run_test, plot_filtrados
+from fun_jose import run_test, plot_filtrados, load_data
 from fun_matias import select_ind
+
+
+
+PUNTUACION_MAXIMA = 20
 
 
 poblacion_actual = []           #Lista con la poblacion actual 
 poblacion_nueva = []            #Lista donde se van volcando los individuos de la proxima poblacion
+
 
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
@@ -27,8 +33,8 @@ lim_Nmin = [2, 2]               #Quiza estos parametros hay que incluirlos en lo
 
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 1                        #Generaciones a correr
-pDim = 20                       #Tamaño de la poblacion
+nGen = 500                      #Generaciones a correr
+pDim = 30                       #Tamaño de la poblacion
 prob_mut = 0.05                 #Probabilidad de que un individuo mute
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
 
@@ -71,15 +77,21 @@ def read_pop():
 
 
 
-def eval_test(curva_filtrada):
-    print('eval_test')
-    #Recive la curva filtrada y toma de la curva del contagio
+def eval_test(original, filtrada):
+    #Toma la curva filtrada y la curva del contagio
     #comparando las 2 y haciendo la evaluacion (error cuadratico medio o error medio)
     #devuelve un valor como resultado de esa comparacion
     #quiza la suma de todos los errores o alguna otra metrica a considerar
 
+    errores_parciales = []
 
-    pass
+    for i in range(len(filtrada)):
+        errores_parciales.append((original[i]-filtrada[i]) ** 2)
+
+    err = sum(errores_parciales) / len(filtrada)
+
+    return err
+    
 
 
 def score_ind():
@@ -124,23 +136,50 @@ def mutac_ind(poblacion):
 
 print('Vamos a tomar',nGen,'generaciones')
 create_pop(pDim)                                #Creo la poblacion aleatoria
-#read_pop();
+
+datos_orig = load_data()                        #Obtengo los datos de contagio
+evol_error = []
+
 for fin in range(nGen):
 
-    #aplicar  filtro a los tipitos
-    for individuo in range(len(poblacion_actual)):
-        poblacion_actual[individuo].get_filt(run_test(poblacion_actual[individuo].param))
-
-    plot_filtrados(poblacion_actual)
-
-    #Evaluacion de la salida del filtro
-    eval_test(nGen)
-    #Seleccion de individuos
+    error_minimo = 10000
+    error_maximo = 0
+    error_promedio = 0
+    ind_minimo_err = 0
+    ind_maximo_err = 0
     
-    #llenando score provisorios----------------------------
-    for individuo in range(len(poblacion_actual)):
-        poblacion_actual[individuo].score=rd.randint(1,20);
-    #------------------------------------------------------
+    for ind in range(len(poblacion_actual)):
+        #aplicar  filtro a los tipitos
+        poblacion_actual[ind].set_filt(run_test(poblacion_actual[ind].param))
+        
+        #Evaluacion de la salida del filtro
+        error_actual = eval_test(datos_orig, poblacion_actual[ind].filtrada)
+        poblacion_actual[ind].error = error_actual
+        error_promedio = error_promedio + error_actual
+
+        if error_actual < error_minimo:
+            error_minimo = error_actual
+            ind_minimo_err = ind
+        if error_actual > error_maximo:
+            error_maximo = error_actual
+            ind_maximo_err = ind
+
+    #Calculo el error promedio de la generacion
+    error_promedio = error_promedio / len(poblacion_actual)
+    evol_error.append(error_promedio)
+
+
+    #plot_filtrados(poblacion_actual)
+
+
+
+    #Asignacion de puntajes
+    for ind in range(len(poblacion_actual)):
+        poblacion_actual[ind].score = PUNTUACION_MAXIMA - (poblacion_actual[ind].error * PUNTUACION_MAXIMA / error_maximo)
+
+
+
+    #Seleccion de individuos
     poblacion_nueva=select_ind(poblacion_actual)
     
     #cruza
@@ -152,3 +191,5 @@ for fin in range(nGen):
 
 #Termino y muestro resultados
 
+plt.plot(evol_error)
+plt.show()

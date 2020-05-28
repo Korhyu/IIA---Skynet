@@ -10,6 +10,9 @@ class individuo():
     #Curva resultado del filtro
     filtrada = []
     
+    #Error entre la curva real y la calculada usando el metodo que corresponda
+    error = 0
+
     """ Alternativa
     # Para el caso del filtro por tratarse de 5 datos con nombre uso un diccionario para almacenar los valores
     # de los distintos parametros del filtro de esta forma cada individuo tiene el nombre del parametro
@@ -24,5 +27,5 @@ class individuo():
     def set_score(self, sc_ind):
         self.score = sc_ind
 
-    def get_filt(self, filtrada):
+    def set_filt(self, filtrada):
         self.filtrada = filtrada.copy()
