@@ -38,6 +38,10 @@ nGen = 1                      #Generaciones a correr
 pDim = 20                      #Tamaño de la poblacion
 prob_mut = 0.05                 #Probabilidad de que un individuo mute
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
+<<<<<<< HEAD
+pCruza=10                        #probabilidad de cruza porcentual
+Cant_param=6
+=======
 
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
@@ -49,6 +53,7 @@ muestras = 100                  #Tamaño de la señal total
 amp_noise = 1                   #Amplitud del ruido
 
 
+>>>>>>> numpy
 
 
 
@@ -197,7 +202,9 @@ for fin in range(nGen):
     #poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
     #cruza    
-    #mate_ind(poblacion_nueva)
+    poblacion_nueva = mate_ind(poblacion_nueva, pCruza,Cant_param)
+    
+
     #mutacion
     #mutac_ind(poblacion_nueva)
 
