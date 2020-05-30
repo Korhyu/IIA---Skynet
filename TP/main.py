@@ -167,7 +167,7 @@ for fin in range(nGen):
 
         #Evaluacion de la salida del filtro
         error_actual = eval_test(datos_orig, salida_filtro[ind,:])
-        error_punt[ind,0] = error_actual
+        error_punt[ind,0] = error_actual                                    #Cargo el error en el numpy
         error_promedio_gen = error_promedio_gen + error_actual
 
         if error_actual < error_minimo:
@@ -182,13 +182,13 @@ for fin in range(nGen):
     evol_error.append(error_promedio_gen)
 
 
-    plot_filtrados(poblacion_actual, salida_filtro)
+    #plot_filtrados(poblacion_actual, salida_filtro)
 
 
 
     #Asignacion de puntajes
     for ind in range(len(poblacion_actual)):
-        poblacion_actual[ind].score = PUNTUACION_MAXIMA - (poblacion_actual[ind].error * PUNTUACION_MAXIMA / error_maximo)
+        error_punt[ind,1]= PUNTUACION_MAXIMA - (error_punt[ind,0] * PUNTUACION_MAXIMA / error_maximo)
 
 
 
