@@ -1,5 +1,6 @@
 from clases import individuo
 import numpy as np
+import random
 import csv
 import math
 import matplotlib.pyplot as plt
@@ -42,24 +43,33 @@ def gen_signal(amp, per, fases, muestras):
     for j in range(muestras):
         st[j] = sum(s[:,j])
 
+    # Le monto una continua para ver si eso es lo que rompe el sigma
+    if st.min() < 0:
+        st = st - st.min()
 
-    #plt.plot(s.transpose())
-    #plt.plot(st)
+    #plt.plot(s.transpose(), label = "original")
+    #plt.plot(st, label = "suma")
+    #plt.legend()
     #plt.show()
 
     return st
 
-def add_noise(amp, signal):
+def add_noise(amp, st):
+    #Agrega ruido aleatorio de amplitud especificada y desplaza la señal completa para no tener valroes negativos
     
-    n = np.random.normal(0, amp, size=len(signal))
+    n = np.random.default_rng().uniform(low=-amp, high=amp, size=len(st))
 
-    signal = signal + n
+    st = st + n
 
-    #plt.plot(n)
-    #plt.plot(signal)
+    if st.min() < 0:
+        st = st - st.min()
+
+    #plt.plot(n, label = "noise")
+    #plt.plot(st, label = "signal")
+    #plt.legend()
     #plt.show()
 
-    return signal
+    return st
 
 
 def FiltroDEWMA(param, data):
@@ -116,14 +126,17 @@ def run_test(param, data):
 
 
 
-def plot_filtrados(pobl, curvas):
+def plot_filtrados(pobl, orig, filtr):
     #Funcion auxiliar para ploteo de las salidas de toda la poblacion del filtro DEWMA
-    plt.plot(load_data(), 'k--', label='Datos de contagio')
+    plt.plot(orig, 'k--', label='Datos con Ruido')
     for ind in range(len(pobl)):
 
-        legend = ' '.join(map(str, pobl[ind])) 
+        #Elimino los decimales de los parametros
+        param = pobl[ind].round(decimals=2) 
 
-        plt.plot(curvas[ind], label = legend)
+        legend = ' '.join(map(str, param)) 
+
+        plt.plot(filtr[ind], label = legend)
         plt.legend()
 
     plt.show()

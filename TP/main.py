@@ -25,12 +25,12 @@ salida_filtro = []              #Array de las salidas del filtro con cada set de
 evol_error = []                 #Evolucion del error en funcion de las generaciones
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
-lim_N = [2, 40]
+lim_N = [5, 40]
 lim_gamma = [1, 2]
 lim_alfa = [1, 2]
 lim_sigma = [1, 10]             #Actualmente no se utiliza y el filtro calcula su sigma propio
-lim_Nmax = [2, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
-lim_Nmin = [1, 39]               #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
+lim_Nmax = [30, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
+lim_Nmin = [5, 15]               #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
@@ -41,12 +41,12 @@ indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el v
 
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
-amp = [10, 15, 12]              #Amplitudes de cada tono
+amp = [10, 0, 0]              #Amplitudes de cada tono
 per = [10, 21, 14]              #Periodos de cada tono
 fase = [0, 0, 1.5]              #Fases de cada tono
-muestras = 80                   #Tamaño de la señal total
+muestras = 100                  #Tamaño de la señal total
 
-amp_noise = 3
+amp_noise = 1                   #Amplitud del ruido
 
 
 
@@ -147,8 +147,8 @@ print('Vamos a tomar',nGen,'generaciones')
 poblacion_actual = create_pop(pDim)                 #Creo la poblacion aleatoria
 
 #datos_orig = load_data()                           #Obtengo los datos de contagio
-datos_orig = gen_signal(amp, per, fase, muestras)   #Genero la señal de prueba
-datos_orig = add_noise(amp_noise, datos_orig)
+datos_puros = gen_signal(amp, per, fase, muestras)  #Genero la señal de prueba
+datos_orig = add_noise(amp_noise, datos_puros)
 
 for fin in range(nGen):
     print('Generacion ',fin)
@@ -167,7 +167,7 @@ for fin in range(nGen):
 
 
         #Evaluacion de la salida del filtro
-        error_actual = eval_test(datos_orig, salida_filtro[ind,:])
+        error_actual = eval_test(datos_puros, salida_filtro[ind,:])
         error_punt[ind,0] = error_actual                                    #Cargo el error en el numpy
         error_promedio_gen = error_promedio_gen + error_actual
 
@@ -183,7 +183,7 @@ for fin in range(nGen):
     evol_error.append(error_promedio_gen)
 
 
-    #plot_filtrados(poblacion_actual, salida_filtro)
+    plot_filtrados(poblacion_actual, datos_orig, salida_filtro)
 
 
 
@@ -194,10 +194,10 @@ for fin in range(nGen):
 
 
     #Seleccion de individuos
-    poblacion_nueva = select_ind(poblacion_actual, error_punt)
+    #poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
     #cruza    
-    mate_ind(poblacion_nueva)
+    #mate_ind(poblacion_nueva)
     #mutacion
     #mutac_ind(poblacion_nueva)
 
@@ -205,5 +205,5 @@ for fin in range(nGen):
 
 #Termino y muestro resultados
 
-plt.plot(evol_error)
-plt.show()
+#plt.plot(evol_error)
+#plt.show()
