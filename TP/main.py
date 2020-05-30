@@ -19,10 +19,10 @@ from fun_matias import select_ind
 PUNTUACION_MAXIMA = 20
 
 
-poblacion_actual = []           #Lista con la poblacion actual 
-poblacion_nueva = []            #Lista donde se van volcando los individuos de la proxima poblacion
-
-
+poblacion_actual = []           #Array con la poblacion actual 
+poblacion_nueva = []            #Array donde se van volcando los individuos de la proxima poblacion
+salida_filtro = []              #Array de las salidas del filtro con cada set de parametros
+evol_error = []                 #Evolucion del error en funcion de las generaciones
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
 lim_N = [2, 40]
@@ -65,11 +65,15 @@ def param_rand():
 
 def create_pop(num_ind):
     #Funcion que crea una poblacion de individuos aleatoria
-    #Cada individuo es una lista de los 5 parametros en el orden N, gamma, alfa, Nmax y Nmin
 
-    for cont in range(num_ind):
-        parametros = param_rand()
-        poblacion_actual.append(individuo(parametros))
+    parametros = param_rand()
+    poblacion = np.array(parametros)
+
+    for cont in range(num_ind-1):
+        parametros = np.array(param_rand())
+        poblacion = np.vstack((poblacion,parametros))
+
+    return poblacion
 
 
 
@@ -140,28 +144,31 @@ def mutac_ind(poblacion):
 
 
 print('Vamos a tomar',nGen,'generaciones')
-create_pop(pDim)                                #Creo la poblacion aleatoria
+poblacion_actual = create_pop(pDim)             #Creo la poblacion aleatoria
 
 datos_orig = load_data()                        #Obtengo los datos de contagio
-evol_error = []
+
 
 for fin in range(nGen):
     print('Generacion ',fin)
 
     error_minimo = 10000
     error_maximo = 0
-    error_promedio = 0
+    error_promedio_gen = 0
     ind_minimo_err = 0
     ind_maximo_err = 0
-    
+    error_punt = np.empty([len(poblacion_actual), 2])      #Vector de errores y puntaje de cada individuo
+    salida_filtro = np.empty([len(poblacion_actual), len(datos_orig)]) 
+
     for ind in range(len(poblacion_actual)):
         #aplicar  filtro a los tipitos
-        poblacion_actual[ind].set_filt(run_test(poblacion_actual[ind].param))
-        
+        salida_filtro[ind] =  run_test(poblacion_actual[ind])
+
+
         #Evaluacion de la salida del filtro
-        error_actual = eval_test(datos_orig, poblacion_actual[ind].filtrada)
-        poblacion_actual[ind].error = error_actual
-        error_promedio = error_promedio + error_actual
+        error_actual = eval_test(datos_orig, salida_filtro[ind,:])
+        error_punt[ind,0] = error_actual
+        error_promedio_gen = error_promedio_gen + error_actual
 
         if error_actual < error_minimo:
             error_minimo = error_actual
@@ -171,11 +178,11 @@ for fin in range(nGen):
             ind_maximo_err = ind
 
     #Calculo el error promedio de la generacion
-    error_promedio = error_promedio / len(poblacion_actual)
-    evol_error.append(error_promedio)
+    error_promedio_gen = error_promedio_gen / len(poblacion_actual)
+    evol_error.append(error_promedio_gen)
 
 
-    plot_filtrados(poblacion_actual)
+    plot_filtrados(poblacion_actual, salida_filtro)
 
 
 

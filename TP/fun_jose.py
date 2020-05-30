@@ -1,5 +1,5 @@
 from clases import individuo
-import numpy
+import numpy as np
 import csv
 import matplotlib.pyplot as plt
 
@@ -18,7 +18,7 @@ def load_data():
         for fila in reader:
             datos.append(int(fila['New']))
         
-        return datos
+        return np.array(datos)
 
 
 
@@ -37,7 +37,7 @@ def FiltroDEWMA(param):
     
 
 
-    DEWMA = numpy.array([variable[0]])
+    DEWMA = np.array([variable[0]])
     Ns = [N]
     for j in range(1,len(variable)):
         sigma = 2 * (DEWMA[j-1])**(1/2)
@@ -52,14 +52,14 @@ def FiltroDEWMA(param):
                 N = Nmax
         Ns.append(N)
         a = DEWMA[j-1] +(variable[j]-DEWMA[j-1])/N
-        DEWMA = numpy.append( DEWMA , numpy.array(a))
+        DEWMA = np.append( DEWMA , np.array(a))
 
     param[0] = N
     param[1] = gama
     param[2] = alfa
     param[3] = sigma
 
-    return [DEWMA, param]
+    return DEWMA
 
 
 
@@ -78,14 +78,14 @@ def run_test(param):
 
 
 
-def plot_filtrados(pobl):
+def plot_filtrados(pobl, curvas):
     #Funcion auxiliar para ploteo de las salidas de toda la poblacion del filtro DEWMA
     plt.plot(load_data(), 'k--', label='Datos de contagio')
     for ind in range(len(pobl)):
 
-        legend = ' '.join(map(str, pobl[ind].param)) 
+        legend = ' '.join(map(str, pobl[ind])) 
 
-        plt.plot(pobl[ind].filtrada, label = legend)
+        plt.plot(curvas[ind], label = legend)
         plt.legend()
 
     plt.show()
