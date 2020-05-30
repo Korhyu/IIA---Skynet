@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 from clases import individuo
 from fun_jose import run_test, plot_filtrados, load_data
-from fun_matias import select_ind
+from fun_matias import select_ind, mate_ind
 
 
 
@@ -34,7 +34,7 @@ lim_Nmin = [1, 39]               #Quiza estos parametros hay que incluirlos en l
 
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 10                      #Generaciones a correr
+nGen = 1                      #Generaciones a correr
 pDim = 20                      #Tamaño de la poblacion
 prob_mut = 0.05                 #Probabilidad de que un individuo mute
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
@@ -111,16 +111,6 @@ def score_ind():
     pass
 
 
-def mate_ind():
-    print('mate_ind')
-    #Esta funcion deberia reccorer la poblacion actual e ir seleccionando los individuos a aparear
-    #para crear uno nuevo
-    #Debe considerar cuantos "puestos libres" hay en la proxima poblacion para no exceder el numero
-
-    pass
-
-
-
 def mutac_ind(poblacion):
     #Funcion que recorre la poblacion futura y genera la mutacion en los individuos
 
@@ -193,14 +183,14 @@ for fin in range(nGen):
 
 
     #Seleccion de individuos
-    poblacion_nueva = select_ind(poblacion_actual)
+    poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
-    #cruza
-    #mate_ind()
+    #cruza    
+    mate_ind(poblacion_nueva)
     #mutacion
-    mutac_ind(poblacion_nueva)
+    #mutac_ind(poblacion_nueva)
 
-    poblacion_actual = poblacion_nueva.copy()
+    #poblacion_actual = poblacion_nueva.copy()
 
 #Termino y muestro resultados
 
