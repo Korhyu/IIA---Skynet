@@ -11,8 +11,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from clases import individuo
-from fun_jose import run_test, plot_filtrados, load_data
 from fun_matias import select_ind, mate_ind
+from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise
 
 
 
@@ -38,8 +38,22 @@ nGen = 1                      #Generaciones a correr
 pDim = 20                      #Tamaño de la poblacion
 prob_mut = 0.05                 #Probabilidad de que un individuo mute
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
+<<<<<<< HEAD
 pCruza=10                        #probabilidad de cruza porcentual
 Cant_param=6
+=======
+
+
+# Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
+amp = [10, 15, 12]              #Amplitudes de cada tono
+per = [10, 21, 14]              #Periodos de cada tono
+fase = [0, 0, 1.5]              #Fases de cada tono
+muestras = 80                   #Tamaño de la señal total
+
+amp_noise = 3
+
+
+>>>>>>> numpy
 
 
 
@@ -57,6 +71,7 @@ def param_rand():
     param[2] = rd.uniform(lim_alfa[0], lim_alfa[1])
     param[3] = rd.uniform(lim_sigma[0], lim_sigma[1])
 
+    # Verifico que el maximo no sea inferior al minimo
     if param[4] < param[5]:
         param[5] = param[4] - 1
 
@@ -134,10 +149,11 @@ def mutac_ind(poblacion):
 
 
 print('Vamos a tomar',nGen,'generaciones')
-poblacion_actual = create_pop(pDim)             #Creo la poblacion aleatoria
+poblacion_actual = create_pop(pDim)                 #Creo la poblacion aleatoria
 
-datos_orig = load_data()                        #Obtengo los datos de contagio
-
+#datos_orig = load_data()                           #Obtengo los datos de contagio
+datos_orig = gen_signal(amp, per, fase, muestras)   #Genero la señal de prueba
+datos_orig = add_noise(amp_noise, datos_orig)
 
 for fin in range(nGen):
     print('Generacion ',fin)
@@ -152,7 +168,7 @@ for fin in range(nGen):
 
     for ind in range(len(poblacion_actual)):
         #aplicar  filtro a los tipitos
-        salida_filtro[ind] =  run_test(poblacion_actual[ind])
+        salida_filtro[ind] =  run_test(poblacion_actual[ind], datos_orig)
 
 
         #Evaluacion de la salida del filtro
