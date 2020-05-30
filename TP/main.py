@@ -34,14 +34,13 @@ lim_Nmin = [5, 15]               #Quiza estos parametros hay que incluirlos en l
 
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 1                      #Generaciones a correr
-pDim = 20                      #Tamaño de la poblacion
+nGen = 10                      #Generaciones a correr
+pDim = 200                      #Tamaño de la poblacion
 prob_mut = 0.05                 #Probabilidad de que un individuo mute
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
-<<<<<<< HEAD
+
 pCruza=10                        #probabilidad de cruza porcentual
 Cant_param=6
-=======
 
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
@@ -52,8 +51,6 @@ muestras = 100                  #Tamaño de la señal total
 
 amp_noise = 1                   #Amplitud del ruido
 
-
->>>>>>> numpy
 
 
 
@@ -188,7 +185,7 @@ for fin in range(nGen):
     evol_error.append(error_promedio_gen)
 
 
-    plot_filtrados(poblacion_actual, datos_orig, salida_filtro)
+    #plot_filtrados(poblacion_actual, datos_orig, salida_filtro)
 
 
 
@@ -199,10 +196,10 @@ for fin in range(nGen):
 
 
     #Seleccion de individuos
-    #poblacion_nueva = select_ind(poblacion_actual, error_punt)
+    poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
     #cruza    
-    poblacion_nueva = mate_ind(poblacion_nueva, pCruza,Cant_param)
+    #poblacion_nueva = mate_ind(poblacion_nueva, pCruza,Cant_param)
     
 
     #mutacion
@@ -212,5 +209,5 @@ for fin in range(nGen):
 
 #Termino y muestro resultados
 
-#plt.plot(evol_error)
-#plt.show()
+plt.plot(evol_error)
+plt.show()
