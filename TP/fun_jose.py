@@ -122,11 +122,7 @@ def run_test(param, data):
 
 
 
-
-
-
-
-def plot_filtrados(pobl, orig, filtr):
+def plot_filtrados(pobl, orig, filtr, archivo=None):
     #Funcion auxiliar para ploteo de las salidas de toda la poblacion del filtro DEWMA
     plt.plot(orig, 'k--', label='Datos con Ruido')
     for ind in range(len(pobl)):
@@ -137,6 +133,15 @@ def plot_filtrados(pobl, orig, filtr):
         legend = ' '.join(map(str, param)) 
 
         plt.plot(filtr[ind], label = legend)
+        
         plt.legend()
 
-    plt.show()
+
+
+
+    if archivo is None:
+        plt.show()
+    else:
+        #plt.set_size_inches(18.5, 10.5, forward=True)
+        plt.savefig(archivo)
+        plt.close()

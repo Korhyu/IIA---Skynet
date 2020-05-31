@@ -35,7 +35,7 @@ lim_Nmin = [5, 15]               #Quiza estos parametros hay que incluirlos en l
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
 nGen = 10                      #Generaciones a correr
-pDim = 200                      #Tamaño de la poblacion
+pDim = 30                      #Tamaño de la poblacion
 prob_mut = 0.05                 #Probabilidad de que un individuo mute
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
 
@@ -152,8 +152,8 @@ poblacion_actual = create_pop(pDim)                 #Creo la poblacion aleatoria
 datos_puros = gen_signal(amp, per, fase, muestras)  #Genero la señal de prueba
 datos_orig = add_noise(amp_noise, datos_puros)
 
-for fin in range(nGen):
-    print('Generacion ',fin)
+for gen in range(nGen):
+    print('Generacion ',gen)
 
     error_minimo = 10000
     error_maximo = 0
@@ -184,8 +184,8 @@ for fin in range(nGen):
     error_promedio_gen = error_promedio_gen / len(poblacion_actual)
     evol_error.append(error_promedio_gen)
 
-
-    #plot_filtrados(poblacion_actual, datos_orig, salida_filtro)
+    archivo = "Evolucion/Gen" + str(gen) + ".png"
+    plot_filtrados(poblacion_actual, datos_orig, salida_filtro, archivo)
 
 
 
