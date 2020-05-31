@@ -33,8 +33,8 @@ lim_Nmin = [10, 10]              #Quiza estos parametros hay que incluirlos en l
 lim_N = [lim_Nmin[0], lim_Nmax[1]]
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 50                      #Generaciones a correr
-pDim = 20                      #Tamaño de la poblacion
+nGen = 101                      #Generaciones a correr
+pDim = 40                      #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
@@ -49,7 +49,7 @@ per = [200, 350, 170]              #Periodos de cada tono
 fase = [0, 0, 1.5]              #Fases de cada tono
 muestras = 2000                  #Tamaño de la señal total
 
-amp_noise = 1                   #Amplitud del ruido
+amp_noise = 40                   #Amplitud del ruido
 
 
 
@@ -165,8 +165,8 @@ for gen in range(nGen):
     error_promedio_gen = error_promedio_gen / len(poblacion_actual)
     evol_error.append(error_promedio_gen)
 
-    archivo = "Evolucion/Gen" + str(gen) + ".png"
-    plot_filtrados(poblacion_actual, datos_orig, salida_filtro, gen)
+    if gen%10 is 0:
+        plot_filtrados(poblacion_actual, datos_orig, salida_filtro, gen)
 
 
     #Asignacion de puntajes
