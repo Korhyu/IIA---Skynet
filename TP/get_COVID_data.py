@@ -1,7 +1,7 @@
 import requests
 import csv
 
-pais = "ar"
+pais = "ch"
 
 url_paises = "https://api.covid19api.com/countries"
 url_datos_totales = "https://api.covid19api.com/total/dayone/country/"
