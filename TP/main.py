@@ -25,17 +25,16 @@ salida_filtro = []              #Array de las salidas del filtro con cada set de
 evol_error = []                 #Evolucion del error en funcion de las generaciones
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
-
-lim_gamma = [1, 2]
-lim_alfa = [1, 2]
+lim_gamma = [0.5, 5]
+lim_alfa = [0.5, 5]
 lim_sigma = [1, 10]             #Actualmente no se utiliza y el filtro calcula su sigma propio
-lim_Nmax = [30, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
-lim_Nmin = [5, 15]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
+lim_Nmax = [40, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
+lim_Nmin = [10, 10]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 lim_N = [lim_Nmin[0], lim_Nmax[1]]
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 10                      #Generaciones a correr
-pDim = 10                      #Tamaño de la poblacion
+nGen = 50                      #Generaciones a correr
+pDim = 20                      #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
@@ -46,7 +45,7 @@ Cant_param=6
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
 amp = [20, 10, 15]              #Amplitudes de cada tono
-per = [200, 420, 350]              #Periodos de cada tono
+per = [200, 350, 170]              #Periodos de cada tono
 fase = [0, 0, 1.5]              #Fases de cada tono
 muestras = 2000                  #Tamaño de la señal total
 
@@ -167,7 +166,7 @@ for gen in range(nGen):
     evol_error.append(error_promedio_gen)
 
     archivo = "Evolucion/Gen" + str(gen) + ".png"
-    plot_filtrados(poblacion_actual, datos_orig, salida_filtro, archivo)
+    plot_filtrados(poblacion_actual, datos_orig, salida_filtro, gen)
 
 
     #Asignacion de puntajes
