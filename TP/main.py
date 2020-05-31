@@ -200,9 +200,9 @@ plt.plot(np.subtract(datos_orig, 80))
 plt.plot(datos_puros)
 
 plt.subplot(132)
-plt.plot(evol_error)
-plt.plot(error_max)
-plt.plot(error_min)
+plt.plot(evol_error,legend='evol')
+plt.plot(error_max,legend='max')
+plt.plot(error_min,legend='min')
 
 
 plt.subplot(133)
