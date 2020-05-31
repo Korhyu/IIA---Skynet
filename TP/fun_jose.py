@@ -44,8 +44,8 @@ def gen_signal(amp, per, fases, muestras):
         st[j] = sum(s[:,j])
 
     # Le monto una continua para ver si eso es lo que rompe el sigma
-    if st.min() < 0:
-        st = st - st.min()
+    #if st.min() < 0:
+    #    st = st - st.min()
 
     #plt.plot(s.transpose(), label = "original")
     #plt.plot(st, label = "suma")
