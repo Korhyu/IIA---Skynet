@@ -16,14 +16,20 @@ def select_ind(poblacion_actual,error_punt):
     # pob_ord=sorted(poblacion_actual, key=lambda individuo : individuo.score, reverse=True)
     #reparto los numeros y genero una nueva lista con los selecionados
     pob_sel=poblacion_actual                                 #Si aca no haces el copy laburas siempre con la misma lista
+    # print('len/2',int(len(poblacion_actual[:,0])/2))
     for individuo in range(int(len(poblacion_actual[:,0])/2)):
         # print(individuo);
         pob_sel[individuo,:]=prueba[individuo,:6];
+    # print('len/4',int(len(poblacion_actual[:,0])/4))
     for individuo in range(int(len(poblacion_actual[:,0])/4)):
         pob_sel[individuo+int(len(poblacion_actual)/2)]=prueba[individuo,:6];
+    # print('len/6',int(len(poblacion_actual[:,0])/6))
     for individuo in range(int(math.ceil(len(poblacion_actual[:,0])/6))):
         pob_sel[individuo+int(len(poblacion_actual)/2)+int(len(poblacion_actual)/4)]=prueba[individuo,:6];
-    for individuo in range(int(math.floor(len(poblacion_actual[:,0])/8))):
+    # print('len/8',int(len(poblacion_actual[:,0])/8))
+    rango_final=int(len(poblacion_actual[:,0]))-int(len(poblacion_actual[:,0])/2)-int(len(poblacion_actual[:,0])/4)-int(len(poblacion_actual[:,0])/6)
+ #   print('rango final',rango_final)
+    for individuo in range(rango_final):
         pob_sel[individuo+int(len(poblacion_actual)/2)+int(len(poblacion_actual)/4)+int(math.floor(len(poblacion_actual[:,0])/6))]=prueba[individuo,:6];
     
     
@@ -113,7 +119,40 @@ def mate_ind(poblacion_nueva,pCruza,Cant_param):
 
 
 
+def mutac_ind(oPob,pMuta,dMuta):
+    #Funcion que recorre la poblacion futura y genera la mutacion en los individuos
+    print('mutac_ind')
+    # for individuo in range(len(poblacion)):
+    #     for i in range(4):                          #Recorro los parametros de ese individuo para ver si mutan. Esta harcodeado el parametro maximo porque esta el tema del Nmax y Nmin
+    #         num = rd.uniform(0, 1)                  #Numero aleatorio para comprar contra la probabilidad de mutacion
+    #         if num <= prob_mut:
+    #             if indx_mut == 0:                   #Si el indice de mutacion es 0, busco un parametro nuevo
+    #                 param_mut = param_rand()        #Obtengo todos los parametros nuevos, mas facil que crear una funcion que me de 1 parametro especifico
+    #                 poblacion[individuo].param[i] = param_mut[i]
+                
+    #             else:                               #"Inercia" de mutacion
+    #                 param_mut = poblacion[individuo].param[i]
+    #                 if i == 0:                      #significa que estoy mutando el N y tiene que ser entero, realizo un redondeo
+    #                     param_mut = round(param_mut * (1 + indx_mut * rd.uniform(-1, 1)))
+    #                 else:
+    #                     param_mut = param_mut * (1 + indx_mut * rd.uniform(-1, 1))
+    
+    aux = oPob
+    cuenta=0
+    print ('tatal',len(oPob[:,0]))
+    print ('param',len(oPob[0,:]))
+    max_muta=(dMuta/100)+1
+    min_muta=1-(dMuta/100)
+    print('MAx muta',max_muta, 'y Min Muta', min_muta)
+    for total in range(len(oPob[:,0])):
+        for param in range(len(oPob[0,:])):
+            if pMuta > (random.randrange(0, 1000, 1))/10:
+                cuenta=cuenta+1
+                aux[total,param]= random.uniform(aux[total,param]*min_muta,aux[total,param]*max_muta)
+    print('Cantidad de parametros mutados', cuenta)
 
+
+    return aux
 
 
 
