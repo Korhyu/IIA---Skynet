@@ -143,7 +143,7 @@ def mutac_ind(oPob,pMuta,dMuta):
     #print ('param',len(oPob[0,:]))
     max_muta=(dMuta/100)+1
     min_muta=1-(dMuta/100)
-    print('MAx muta',max_muta, 'y Min Muta', min_muta)
+    print('Max muta',max_muta, 'y Min Muta', min_muta)
     for total in range(len(oPob[:,0])):
         for param in range(len(oPob[0,:])):
             if pMuta > (random.randrange(0, 1000, 1))/10:
@@ -151,7 +151,7 @@ def mutac_ind(oPob,pMuta,dMuta):
                 
                 if param == 0 or param==4 or param==5:
                     aux[total,param]= round(random.uniform(aux[total,param]*min_muta,aux[total,param]*max_muta))
-                    print('redondo redonde ', aux[total,param])
+                    #print('redondo redonde ', aux[total,param])
                 else:
                     aux[total,param]= random.uniform(aux[total,param]*min_muta,aux[total,param]*max_muta)
                     

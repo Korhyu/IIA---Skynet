@@ -19,8 +19,8 @@ from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise,
 PUNTUACION_MAXIMA = 20
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 10                      #Generaciones a correr
-pDim = 10                      #Tamaño de la poblacion
+nGen = 101                      #Generaciones a correr
+pDim = 20                      #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
 pCruza=10                        #probabilidad de cruza porcentual
@@ -32,15 +32,15 @@ poblacion_actual = []           #Array con la poblacion actual
 poblacion_nueva = []            #Array donde se van volcando los individuos de la proxima poblacion
 salida_filtro = []              #Array de las salidas del filtro con cada set de parametros
 evol_error = []  
-error_max=np.zeros(pDim)               #Evolucion del error en funcion de las generaciones
-error_min=np.zeros(pDim)
+error_max=np.zeros(nGen)               #Evolucion del error en funcion de las generaciones
+error_min=np.zeros(nGen)
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
-lim_gamma = [0.5, 5]
-lim_alfa = [0.5, 5]
+lim_gamma = [0.75, 5]
+lim_alfa = [0.75, 5]
 lim_sigma = [1, 10]             #Actualmente no se utiliza y el filtro calcula su sigma propio
 lim_Nmax = [40, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
-lim_Nmin = [10, 10]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
+lim_Nmin = [5, 5]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 lim_N = [lim_Nmin[0], lim_Nmax[1]]
 
 
@@ -159,11 +159,14 @@ for gen in range(nGen):
         if error_actual < error_minimo:
             error_minimo = error_actual
             ind_minimo_err = ind
-            error_min[ind-1]=error_actual
+            
         if error_actual > error_maximo:
             error_maximo = error_actual
             ind_maximo_err = ind
-            error_max[ind-1]=error_actual
+            
+
+    error_min[gen] = error_minimo
+    error_max[gen] = error_maximo
 
     #Calculo el error promedio de la generacion
     error_promedio_gen = error_promedio_gen / len(poblacion_actual)
@@ -175,7 +178,7 @@ for gen in range(nGen):
     #Asignacion de puntajes
     score_pob(error_punt, error_maximo)
 
-    print(poblacion_actual)
+    #print(poblacion_actual)
     #Seleccion de individuos
     poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
@@ -185,73 +188,43 @@ for gen in range(nGen):
     #mutacion
     poblacion_actual = mutac_ind(poblacion_nueva,pMuta,dMuta)
 
-    print(poblacion_actual)
+    #print(poblacion_actual)
 
 #Termino y muestro resultados
-plot_error(evol_error)
+#plot_error(evol_error)
 
-print("Los mejores parametros son " + str())
-
-
-plt.figure(figsize=(9, 3))
-
-plt.subplot(131)
-plt.plot(np.subtract(datos_orig, 80))
-plt.plot(datos_puros)
-
-plt.subplot(132)
-plt.plot(evol_error,legend='evol')
-plt.plot(error_max,legend='max')
-plt.plot(error_min,legend='min')
+#print("Los mejores parametros son " + str(poblacion_actual[0,:]))
 
 
-plt.subplot(133)
-plt.plot(evol_error)
-plt.suptitle('Categorical Plotting')
-plt.show()
+plt.figure(figsize=(14, 10))
+
+plt.subplot(311)
+plt.plot(datos_orig-80, label='Señal con ruido')
+plt.plot(datos_puros-40, label='Señal sin ruido')
+plt.ylabel('Valor')
+plt.xlabel('Tiempo')
+plt.grid(True)
+plt.legend(loc=4)
+
+plt.subplot(312)
+plt.plot(evol_error, label='Medio generacional')
+plt.plot(error_max, label='Maximo generacional')
+plt.plot(error_min, label='Minimo generacional')
+plt.ylabel('Valor')
+plt.xlabel('Tiempo')
+plt.grid(True)
+plt.legend(loc=1)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+plt.subplot(313)
+plt.plot(evol_error, label='Medio generacional')
+plt.plot(error_min, label='Error minimo por generacion')
+plt.suptitle('Evolucion del error generacional')
+plt.ylabel('Valor')
+plt.xlabel('Tiempo')
+plt.grid(True)
+plt.legend(loc=1)
+plt.savefig("Evolucion/Error.png")
+plt.close()
 
 
