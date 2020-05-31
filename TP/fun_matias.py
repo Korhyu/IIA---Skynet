@@ -150,7 +150,7 @@ def mutac_ind(oPob,pMuta,dMuta):
                 cuenta=cuenta+1
                 aux[total,param]= random.uniform(aux[total,param]*min_muta,aux[total,param]*max_muta)
     print('Cantidad de parametros mutados', cuenta)
-
+    #1 5 6 son int
 
     return aux
 
