@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 from clases import individuo
 from fun_matias import select_ind, mate_ind,mutac_ind
-from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise
+from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error
 
 
 
@@ -116,12 +116,12 @@ def eval_test(original, filtrada):
     
 
 
-def score_ind():
-    print('score_ind')
+def score_pob(error_punt, error_maximo):
     #Esta funcion deberia tomar el error de la funcion eval_test y asignar un puntaje 
-    #quiza esta funcion este de mas.... probablemente.... casi seguro....
 
-    pass
+    for ind in range(len(poblacion_actual)):
+        error_punt[ind,1]= PUNTUACION_MAXIMA - (error_punt[ind,0] * PUNTUACION_MAXIMA / error_maximo)
+
 
 
 print('Vamos a tomar',nGen,'generaciones')
@@ -134,6 +134,8 @@ datos_orig = add_noise(amp_noise, datos_puros)
 for gen in range(nGen):
     print('Generacion ',gen)
 
+    poblacion_nueva = []                                    #Reinicio la poblacion nueva
+
     error_minimo = 10000
     error_maximo = 0
     error_promedio_gen = 0
@@ -142,6 +144,7 @@ for gen in range(nGen):
     error_punt = np.empty([len(poblacion_actual), 2])      #Vector de errores y puntaje de cada individuo
     salida_filtro = np.empty([len(poblacion_actual), len(datos_orig)]) 
 
+    # Evaluo cada individuo y le asigno el error
     for ind in range(len(poblacion_actual)):
         #aplicar  filtro a los tipitos
         salida_filtro[ind] =  run_test(poblacion_actual[ind], datos_orig)
@@ -167,10 +170,8 @@ for gen in range(nGen):
     plot_filtrados(poblacion_actual, datos_orig, salida_filtro, archivo)
 
 
-
     #Asignacion de puntajes
-    for ind in range(len(poblacion_actual)):
-        error_punt[ind,1]= PUNTUACION_MAXIMA - (error_punt[ind,0] * PUNTUACION_MAXIMA / error_maximo)
+    score_pob(error_punt, error_maximo)
 
     #Seleccion de individuos
     poblacion_nueva = select_ind(poblacion_actual, error_punt)
@@ -179,16 +180,11 @@ for gen in range(nGen):
     poblacion_nueva = mate_ind(poblacion_nueva, pCruza,Cant_param)
     
     #mutacion
-    poblacion_nueva = mutac_ind(poblacion_nueva,pMuta,dMuta)
+    poblacion_actual = mutac_ind(poblacion_nueva,pMuta,dMuta)
 
-    #poblacion_actual = poblacion_nueva.copy()
 
 #Termino y muestro resultados
+plot_error(evol_error)
 
-fig = plt.figure(figsize=(22,18), dpi='150')
-plt.plot(evol_error)
-plt.set_ylabel('Error promedio')
-plt.set_xlabel('Generacion')
-plt.set_title('Evolucion del error por generacion')
-plt.savefig("Evolucion/Error.png")
-plt.close()
+
+print("Los mejores parametros son " + str())

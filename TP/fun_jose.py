@@ -124,6 +124,11 @@ def run_test(param, data):
 
 def plot_filtrados(pobl, orig, filtr, archivo=None):
     #Funcion auxiliar para ploteo de las salidas de toda la poblacion del filtro DEWMA
+    fig = plt.figure(figsize=(12,10))
+    plt.ylabel('Valor')
+    plt.xlabel('Tiempo')
+    plt.title('Resultados de Generacion')
+
     plt.plot(orig, 'k--', label='Datos con Ruido')
     for ind in range(len(pobl)):
 
@@ -134,9 +139,7 @@ def plot_filtrados(pobl, orig, filtr, archivo=None):
 
         plt.plot(filtr[ind], label = legend)
         
-        plt.legend()
-
-
+    plt.legend(loc=4)
 
 
     if archivo is None:
@@ -145,3 +148,26 @@ def plot_filtrados(pobl, orig, filtr, archivo=None):
         #plt.set_size_inches(18.5, 10.5, forward=True)
         plt.savefig(archivo)
         plt.close()
+
+
+
+
+    '''Incertar subploteo aca como segunda parte de esta funcion a todo ponerles nombres 
+    distinto de archivo con alguna diferencia para que no se pisen
+    Son todas ideas eh... fijate cuales te parecen piolas y si se te ocurren mas
+        -Ploteo con la señal original y sin ruido
+        -Ploteo con la señal original, el mejor de la poblacion y el peor
+        -Ploteo de los errores (diferencia entre señal y salida del filtro) ya estan en el vector
+        -Error maximo (un color), minimo (otro color) y promedio (otro color) de la generacion
+
+    '''
+
+def plot_error(evol_error):
+    #Funcion que genera el ploteo de la evolucion del error
+    fig = plt.figure(figsize=(10,8))
+    plt.plot(evol_error)
+    plt.ylabel('Error promedio')
+    plt.xlabel('Generacion')
+    plt.title('Evolucion del error por generacion')
+    plt.savefig("Evolucion/Error.png")
+    plt.close()

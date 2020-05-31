@@ -8,7 +8,7 @@ import random
 
 
 def select_ind(poblacion_actual,error_punt):
-    print('select_ind')
+    #print('select_ind')
     prueba=np.concatenate((poblacion_actual, error_punt), axis=1)
     prueba=prueba[np.argsort(-1*prueba[:,7])]
     
@@ -48,7 +48,7 @@ def select_ind(poblacion_actual,error_punt):
 #sorted_array = an_array[numpy.argsort(an_array[:, 1])]
     
 def mate_ind(poblacion_nueva,pCruza,Cant_param):
-    print('mate_ind')
+    #print('mate_ind')
     aux = np.arange(6)
     aux_pasa = np.arange(6)
     cant_cruza=0
@@ -121,7 +121,7 @@ def mate_ind(poblacion_nueva,pCruza,Cant_param):
 
 def mutac_ind(oPob,pMuta,dMuta):
     #Funcion que recorre la poblacion futura y genera la mutacion en los individuos
-    print('mutac_ind')
+    #print('mutac_ind')
     # for individuo in range(len(poblacion)):
     #     for i in range(4):                          #Recorro los parametros de ese individuo para ver si mutan. Esta harcodeado el parametro maximo porque esta el tema del Nmax y Nmin
     #         num = rd.uniform(0, 1)                  #Numero aleatorio para comprar contra la probabilidad de mutacion
@@ -139,8 +139,8 @@ def mutac_ind(oPob,pMuta,dMuta):
     
     aux = oPob
     cuenta=0
-    print ('tatal',len(oPob[:,0]))
-    print ('param',len(oPob[0,:]))
+    #print ('tatal',len(oPob[:,0]))
+    #print ('param',len(oPob[0,:]))
     max_muta=(dMuta/100)+1
     min_muta=1-(dMuta/100)
     print('MAx muta',max_muta, 'y Min Muta', min_muta)
