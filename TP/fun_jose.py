@@ -79,8 +79,8 @@ def FiltroDEWMA(param, data):
     gama = param[1]
     alfa = param[2]
     sigma = param[3]
-    Nmax = param[4]
-    Nmin = param[5]
+    Nmax = 40
+    Nmin = 10
 
     variable = data
 
@@ -89,18 +89,24 @@ def FiltroDEWMA(param, data):
     Ns = [N]
     for j in range(1,len(variable)):
         sigma = 2 * (DEWMA[j-1])**(1/2)
+        #sigma = sigma / (2 * (DEWMA[j-1])**(1/2))
         error = abs(variable[j]-DEWMA[j-1])
         if error > sigma:
-            N = N/gama
+            N = round(N/gama)
             if N < Nmin:
                 N = Nmin
         if error < sigma/alfa: 
-            N = N * gama
+            N = round(N * gama)
             if N > Nmax:
                 N = Nmax
+        if N < Nmin:
+            N = Nmin
+        elif N > Nmax:
+            N = Nmax
         Ns.append(N)
         a = DEWMA[j-1] +(variable[j]-DEWMA[j-1])/N
         DEWMA = np.append( DEWMA , np.array(a))
+
 
     param[0] = N
     param[1] = gama
@@ -122,8 +128,10 @@ def run_test(param, data):
 
 
 
-def plot_filtrados(pobl, orig, filtr, archivo=None):
+def plot_filtrados(pobl, orig, filtr, gen=None):
     #Funcion auxiliar para ploteo de las salidas de toda la poblacion del filtro DEWMA
+
+    archivo = "Evolucion/Gen" + str(gen) + ".png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
     plt.xlabel('Tiempo')

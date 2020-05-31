@@ -36,19 +36,18 @@ error_max=np.zeros(pDim)               #Evolucion del error en funcion de las ge
 error_min=np.zeros(pDim)
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
-
-lim_gamma = [1, 2]
-lim_alfa = [1, 2]
+lim_gamma = [0.5, 5]
+lim_alfa = [0.5, 5]
 lim_sigma = [1, 10]             #Actualmente no se utiliza y el filtro calcula su sigma propio
-lim_Nmax = [30, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
-lim_Nmin = [5, 15]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
+lim_Nmax = [40, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
+lim_Nmin = [10, 10]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 lim_N = [lim_Nmin[0], lim_Nmax[1]]
 
 
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
 amp = [20, 10, 15]              #Amplitudes de cada tono
-per = [200, 420, 350]              #Periodos de cada tono
+per = [200, 350, 170]              #Periodos de cada tono
 fase = [0, 0, 1.5]              #Fases de cada tono
 muestras = 2000                  #Tamaño de la señal total
 
@@ -170,11 +169,8 @@ for gen in range(nGen):
     error_promedio_gen = error_promedio_gen / len(poblacion_actual)
     evol_error.append(error_promedio_gen)
 
-    archivo = "Evolucion/Gen" + str(gen) + ".png"
-    plot_filtrados(poblacion_actual, datos_orig, salida_filtro, archivo)
-    # plot_f()
-    
-    
+    if gen%10 is 0:
+        plot_filtrados(poblacion_actual, datos_orig, salida_filtro, gen)
 
     #Asignacion de puntajes
     score_pob(error_punt, error_maximo)
