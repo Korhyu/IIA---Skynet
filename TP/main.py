@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from clases import individuo
-from fun_matias import select_ind, mate_ind
+from fun_matias import select_ind, mate_ind,mutac_ind
 from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise
 
 
@@ -35,8 +35,9 @@ lim_N = [lim_Nmin[0], lim_Nmax[1]]
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
 nGen = 10                      #Generaciones a correr
-pDim = 30                      #Tamaño de la poblacion
-prob_mut = 0.05                 #Probabilidad de que un individuo mute
+pDim = 10                      #Tamaño de la poblacion
+pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
+dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
 indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
 
 pCruza=10                        #probabilidad de cruza porcentual
@@ -123,28 +124,6 @@ def score_ind():
     pass
 
 
-def mutac_ind(poblacion):
-    #Funcion que recorre la poblacion futura y genera la mutacion en los individuos
-
-    for individuo in range(len(poblacion)):
-        for i in range(4):                          #Recorro los parametros de ese individuo para ver si mutan. Esta harcodeado el parametro maximo porque esta el tema del Nmax y Nmin
-            num = rd.uniform(0, 1)                  #Numero aleatorio para comprar contra la probabilidad de mutacion
-            if num <= prob_mut:
-                if indx_mut == 0:                   #Si el indice de mutacion es 0, busco un parametro nuevo
-                    param_mut = param_rand()        #Obtengo todos los parametros nuevos, mas facil que crear una funcion que me de 1 parametro especifico
-                    poblacion[individuo].param[i] = param_mut[i]
-                
-                else:                               #"Inercia" de mutacion
-                    param_mut = poblacion[individuo].param[i]
-                    if i == 0:                      #significa que estoy mutando el N y tiene que ser entero, realizo un redondeo
-                        param_mut = round(param_mut * (1 + indx_mut * rd.uniform(-1, 1)))
-                    else:
-                        param_mut = param_mut * (1 + indx_mut * rd.uniform(-1, 1))
-
-
-
-
-
 print('Vamos a tomar',nGen,'generaciones')
 poblacion_actual = create_pop(pDim)                 #Creo la poblacion aleatoria
 
@@ -193,17 +172,14 @@ for gen in range(nGen):
     for ind in range(len(poblacion_actual)):
         error_punt[ind,1]= PUNTUACION_MAXIMA - (error_punt[ind,0] * PUNTUACION_MAXIMA / error_maximo)
 
-
-
     #Seleccion de individuos
     poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
     #cruza    
     poblacion_nueva = mate_ind(poblacion_nueva, pCruza,Cant_param)
     
-
     #mutacion
-    #mutac_ind(poblacion_nueva)
+    poblacion_nueva = mutac_ind(poblacion_nueva,pMuta,dMuta)
 
     #poblacion_actual = poblacion_nueva.copy()
 
