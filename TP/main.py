@@ -25,13 +25,13 @@ salida_filtro = []              #Array de las salidas del filtro con cada set de
 evol_error = []                 #Evolucion del error en funcion de las generaciones
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
-lim_N = [5, 40]
+
 lim_gamma = [1, 2]
 lim_alfa = [1, 2]
 lim_sigma = [1, 10]             #Actualmente no se utiliza y el filtro calcula su sigma propio
 lim_Nmax = [30, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
-lim_Nmin = [5, 15]               #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
-
+lim_Nmin = [5, 15]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
+lim_N = [lim_Nmin[0], lim_Nmax[1]]
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
 nGen = 10                      #Generaciones a correr
@@ -45,10 +45,10 @@ Cant_param=6
 
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
-amp = [10, 0, 0]              #Amplitudes de cada tono
-per = [10, 21, 14]              #Periodos de cada tono
+amp = [20, 10, 15]              #Amplitudes de cada tono
+per = [200, 420, 350]              #Periodos de cada tono
 fase = [0, 0, 1.5]              #Fases de cada tono
-muestras = 100                  #Tamaño de la señal total
+muestras = 2000                  #Tamaño de la señal total
 
 amp_noise = 1                   #Amplitud del ruido
 
@@ -176,7 +176,7 @@ for gen in range(nGen):
     poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
     #cruza    
-    #poblacion_nueva = mate_ind(poblacion_nueva, pCruza,Cant_param)
+    poblacion_nueva = mate_ind(poblacion_nueva, pCruza,Cant_param)
     
     #mutacion
     poblacion_nueva = mutac_ind(poblacion_nueva,pMuta,dMuta)
@@ -185,5 +185,10 @@ for gen in range(nGen):
 
 #Termino y muestro resultados
 
+fig = plt.figure(figsize=(22,18), dpi='150')
 plt.plot(evol_error)
-plt.show()
+plt.set_ylabel('Error promedio')
+plt.set_xlabel('Generacion')
+plt.set_title('Evolucion del error por generacion')
+plt.savefig("Evolucion/Error.png")
+plt.close()
