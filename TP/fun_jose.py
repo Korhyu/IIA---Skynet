@@ -63,7 +63,7 @@ def add_noise(amp, st):
 
     if st.min() < 0:
         st = st - st.min()
-
+    
     #plt.plot(n, label = "noise")
     #plt.plot(st, label = "signal")
     #plt.legend()

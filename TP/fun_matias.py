@@ -47,7 +47,7 @@ def select_ind(poblacion_actual,error_punt):
 # np.sort(a, order='height')  
 #sorted_array = an_array[numpy.argsort(an_array[:, 1])]
     
-def mate_ind(poblacion_nueva,pCruza,Cant_param):
+def mate_ind(poblacion_nueva,pCruza):
     #print('mate_ind')
     aux = np.arange(6)
     aux_pasa = np.arange(6)
@@ -84,7 +84,7 @@ def mate_ind(poblacion_nueva,pCruza,Cant_param):
         # print(aux)
         while i>=2:
             #elijo el punto de quiebre al azar y lo aplico
-            pQuiebre=random.randrange(1, (Cant_param*5)-1,1)
+            pQuiebre=random.randrange(1, (int(len(poblacion_nueva[0,:]))*5)-1,1)
             # print(pQuiebre)
             for pQ in range(math.floor(pQuiebre/5)):
                 aux_cruz[pQ]=aux[i,pQ]
@@ -148,14 +148,32 @@ def mutac_ind(oPob,pMuta,dMuta):
         for param in range(len(oPob[0,:])):
             if pMuta > (random.randrange(0, 1000, 1))/10:
                 cuenta=cuenta+1
-                aux[total,param]= random.uniform(aux[total,param]*min_muta,aux[total,param]*max_muta)
+                
+                if param == 0 or param==4 or param==5:
+                    aux[total,param]= round(random.uniform(aux[total,param]*min_muta,aux[total,param]*max_muta))
+                    print('redondo redonde ', aux[total,param])
+                else:
+                    aux[total,param]= random.uniform(aux[total,param]*min_muta,aux[total,param]*max_muta)
+                    
     print('Cantidad de parametros mutados', cuenta)
     #1 5 6 son int
 
     return aux
 
 
+'''Incertar subploteo aca como segunda parte de esta funcion a todo ponerles nombres 
+    distinto de archivo con alguna diferencia para que no se pisen
+    Son todas ideas eh... fijate cuales te parecen piolas y si se te ocurren mas
+        -Ploteo con la señal original y sin ruido
+        -Ploteo con la señal original, el mejor de la poblacion y el peor
+        -Ploteo de los errores (diferencia entre señal y salida del filtro) ya estan en el vector
+        -Error maximo (un color), minimo (otro color) y promedio (otro color) de la generacion
 
+'''
+
+def plot_f():
+
+    return
 
 
 

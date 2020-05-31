@@ -11,18 +11,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from clases import individuo
-from fun_matias import select_ind, mate_ind,mutac_ind
+from fun_matias import select_ind, mate_ind,mutac_ind,plot_f
 from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error
 
 
 
 PUNTUACION_MAXIMA = 20
 
+# Parametros del GA ----------------------------------------------------------------------------------------------------------------------
+nGen = 10                      #Generaciones a correr
+pDim = 10                      #Tamaño de la poblacion
+pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
+dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
+pCruza=10                        #probabilidad de cruza porcentual
+
+# ----------------------------------------------------------------------------------------------------------------------
+
 
 poblacion_actual = []           #Array con la poblacion actual 
 poblacion_nueva = []            #Array donde se van volcando los individuos de la proxima poblacion
 salida_filtro = []              #Array de las salidas del filtro con cada set de parametros
-evol_error = []                 #Evolucion del error en funcion de las generaciones
+evol_error = []  
+error_max=np.zeros(pDim)               #Evolucion del error en funcion de las generaciones
+error_min=np.zeros(pDim)
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
 
@@ -33,15 +44,6 @@ lim_Nmax = [30, 40]             #Hay que revisar estos limites porque el filtro 
 lim_Nmin = [5, 15]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 lim_N = [lim_Nmin[0], lim_Nmax[1]]
 
-# Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 10                      #Generaciones a correr
-pDim = 10                      #Tamaño de la poblacion
-pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
-dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
-indx_mut = 0                    #Indice de la mutacion (cuanto puede variar el valor original) Si es 0 el valor del parametro se asigna nuevo
-
-pCruza=10                        #probabilidad de cruza porcentual
-Cant_param=6
 
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
@@ -50,7 +52,7 @@ per = [200, 420, 350]              #Periodos de cada tono
 fase = [0, 0, 1.5]              #Fases de cada tono
 muestras = 2000                  #Tamaño de la señal total
 
-amp_noise = 1                   #Amplitud del ruido
+amp_noise = 40                   #Amplitud del ruido
 
 
 
@@ -158,9 +160,11 @@ for gen in range(nGen):
         if error_actual < error_minimo:
             error_minimo = error_actual
             ind_minimo_err = ind
+            error_min[ind-1]=error_actual
         if error_actual > error_maximo:
             error_maximo = error_actual
             ind_maximo_err = ind
+            error_max[ind-1]=error_actual
 
     #Calculo el error promedio de la generacion
     error_promedio_gen = error_promedio_gen / len(poblacion_actual)
@@ -168,23 +172,90 @@ for gen in range(nGen):
 
     archivo = "Evolucion/Gen" + str(gen) + ".png"
     plot_filtrados(poblacion_actual, datos_orig, salida_filtro, archivo)
-
+    # plot_f()
+    
+    
 
     #Asignacion de puntajes
     score_pob(error_punt, error_maximo)
 
+    print(poblacion_actual)
     #Seleccion de individuos
     poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
     #cruza    
-    poblacion_nueva = mate_ind(poblacion_nueva, pCruza,Cant_param)
+    poblacion_nueva = mate_ind(poblacion_nueva, pCruza)
     
     #mutacion
     poblacion_actual = mutac_ind(poblacion_nueva,pMuta,dMuta)
 
+    print(poblacion_actual)
 
 #Termino y muestro resultados
 plot_error(evol_error)
 
-
 print("Los mejores parametros son " + str())
+
+
+plt.figure(figsize=(9, 3))
+
+plt.subplot(131)
+plt.plot(np.subtract(datos_orig, 80))
+plt.plot(datos_puros)
+
+plt.subplot(132)
+plt.plot(evol_error)
+plt.plot(error_max)
+plt.plot(error_min)
+
+
+plt.subplot(133)
+plt.plot(evol_error)
+plt.suptitle('Categorical Plotting')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
