@@ -19,8 +19,8 @@ from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise,
 PUNTUACION_MAXIMA = 20
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 10                      #Generaciones a correr
-pDim = 10                      #Tamaño de la poblacion
+nGen = 100                      #Generaciones a correr
+pDim = 50                      #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
 pCruza=10                        #probabilidad de cruza porcentual
@@ -32,8 +32,8 @@ poblacion_actual = []           #Array con la poblacion actual
 poblacion_nueva = []            #Array donde se van volcando los individuos de la proxima poblacion
 salida_filtro = []              #Array de las salidas del filtro con cada set de parametros
 evol_error = []  
-error_max=np.zeros(pDim)               #Evolucion del error en funcion de las generaciones
-error_min=np.zeros(pDim)
+error_max=np.zeros(nGen)               #Evolucion del error en funcion de las generaciones
+error_min=np.zeros(nGen)
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
 lim_gamma = [0.5, 5]
@@ -159,11 +159,11 @@ for gen in range(nGen):
         if error_actual < error_minimo:
             error_minimo = error_actual
             ind_minimo_err = ind
-            error_min[ind-1]=error_actual
+            error_min[gen]=error_actual
         if error_actual > error_maximo:
             error_maximo = error_actual
             ind_maximo_err = ind
-            error_max[ind-1]=error_actual
+            error_max[gen]=error_actual
 
     #Calculo el error promedio de la generacion
     error_promedio_gen = error_promedio_gen / len(poblacion_actual)
@@ -200,9 +200,9 @@ plt.plot(np.subtract(datos_orig, 80))
 plt.plot(datos_puros)
 
 plt.subplot(132)
-plt.plot(evol_error,legend='evol')
-plt.plot(error_max,legend='max')
-plt.plot(error_min,legend='min')
+plt.plot(evol_error,label='evol')
+plt.plot(error_max,label='max')
+plt.plot(error_min,label='min')
 
 
 plt.subplot(133)
