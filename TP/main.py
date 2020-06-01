@@ -19,8 +19,8 @@ from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise,
 PUNTUACION_MAXIMA = 20
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 100                      #Generaciones a correr
-pDim = 50                      #Tamaño de la poblacion
+nGen = 500                    #Generaciones a correr
+pDim = 100                     #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
 pCruza=10                        #probabilidad de cruza porcentual
@@ -225,6 +225,7 @@ plt.xlabel('Tiempo')
 plt.grid(True)
 plt.legend(loc=1)
 plt.savefig("Evolucion/Error.png")
-plt.close()
+plt.show()
+# plt.close()
 
 

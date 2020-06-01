@@ -11,26 +11,52 @@ def select_ind(poblacion_actual,error_punt):
     #print('select_ind')
     prueba=np.concatenate((poblacion_actual, error_punt), axis=1)
     prueba=prueba[np.argsort(-1*prueba[:,7])]
-    
+    pob_sel=poblacion_actual
+    suma=0
+    aux_s=0
+    for individuo in range(int(len(poblacion_actual[:,0]))):
+        suma=suma+prueba[individuo,7]
+    for individuo in range(int(len(poblacion_actual[:,0]))):
+        prueba[individuo,6]=round((prueba[individuo,7]/suma)*100)
+    # for individuo in range(int(len(poblacion_actual[:,0]))):
+    aux = np.zeros(8*100).reshape(100,8)
+    # print(prueba)
+    for individuo in range(int(len(prueba[:,0]))):
+        for i in range(int(prueba[individuo,6])):
+            
+            if aux_s > 99:
+                print('prueba')
+            else:
+                aux[aux_s,:]=np.copy(prueba[individuo,:])
+            aux_s=aux_s+1
+
+    for i in range(int(len(prueba[:,0]))):       
+        rd=random.randrange(0,100,1)
+        pob_sel[i,:]=np.copy(aux[rd,:6])
+        while aux[rd,6]==0:
+            pob_sel[i,:]=np.copy(aux[rd,:6])
+            rd=random.randrange(0,100,1)
+                            
+    print(pob_sel)
     #pob_ord=sorted(poblacion_actual[].score);
     # pob_ord=sorted(poblacion_actual, key=lambda individuo : individuo.score, reverse=True)
-    #reparto los numeros y genero una nueva lista con los selecionados
-    pob_sel=poblacion_actual                                 #Si aca no haces el copy laburas siempre con la misma lista
-    # print('len/2',int(len(poblacion_actual[:,0])/2))
-    for individuo in range(int(len(poblacion_actual[:,0])/2)):
-        # print(individuo);
-        pob_sel[individuo,:]=prueba[individuo,:6];
-    # print('len/4',int(len(poblacion_actual[:,0])/4))
-    for individuo in range(int(len(poblacion_actual[:,0])/4)):
-        pob_sel[individuo+int(len(poblacion_actual)/2)]=prueba[individuo,:6];
-    # print('len/6',int(len(poblacion_actual[:,0])/6))
-    for individuo in range(int(math.ceil(len(poblacion_actual[:,0])/6))):
-        pob_sel[individuo+int(len(poblacion_actual)/2)+int(len(poblacion_actual)/4)]=prueba[individuo,:6];
-    # print('len/8',int(len(poblacion_actual[:,0])/8))
-    rango_final=int(len(poblacion_actual[:,0]))-int(len(poblacion_actual[:,0])/2)-int(len(poblacion_actual[:,0])/4)-int(len(poblacion_actual[:,0])/6)
- #   print('rango final',rango_final)
-    for individuo in range(rango_final):
-        pob_sel[individuo+int(len(poblacion_actual)/2)+int(len(poblacion_actual)/4)+int(math.floor(len(poblacion_actual[:,0])/6))]=prueba[individuo,:6];
+ #    #reparto los numeros y genero una nueva lista con los selecionados
+ #    pob_sel=poblacion_actual                                 #Si aca no haces el copy laburas siempre con la misma lista
+ #    # print('len/2',int(len(poblacion_actual[:,0])/2))
+ #    for individuo in range(int(len(poblacion_actual[:,0])/2)):
+ #        # print(individuo);
+ #        pob_sel[individuo,:]=prueba[individuo,:6];
+ #    # print('len/4',int(len(poblacion_actual[:,0])/4))
+ #    for individuo in range(int(len(poblacion_actual[:,0])/4)):
+ #        pob_sel[individuo+int(len(poblacion_actual)/2)]=prueba[individuo,:6];
+ #    # print('len/6',int(len(poblacion_actual[:,0])/6))
+ #    for individuo in range(int(math.ceil(len(poblacion_actual[:,0])/6))):
+ #        pob_sel[individuo+int(len(poblacion_actual)/2)+int(len(poblacion_actual)/4)]=prueba[individuo,:6];
+ #    # print('len/8',int(len(poblacion_actual[:,0])/8))
+ #    rango_final=int(len(poblacion_actual[:,0]))-int(len(poblacion_actual[:,0])/2)-int(len(poblacion_actual[:,0])/4)-int(len(poblacion_actual[:,0])/6)
+ # #   print('rango final',rango_final)
+ #    for individuo in range(rango_final):
+ #        pob_sel[individuo+int(len(poblacion_actual)/2)+int(len(poblacion_actual)/4)+int(math.floor(len(poblacion_actual[:,0])/6))]=prueba[individuo,:6];
     
     
     #envio la lista pa la proxima etapa        
