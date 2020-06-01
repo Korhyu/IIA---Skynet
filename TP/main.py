@@ -167,7 +167,7 @@ for gen in range(nGen):
         if error_actual < error_minimo:
             error_minimo = error_actual
             ind_minimo_err = ind
-            
+            error_min[gen]=error_actual
         if error_actual > error_maximo:
             error_maximo = error_actual
             ind_maximo_err = ind
