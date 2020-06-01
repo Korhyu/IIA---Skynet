@@ -11,23 +11,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from clases import individuo
-from fun_matias import select_ind, mate_ind,mutac_ind,plot_f
-from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error
+from fun_matias import select_ind, mate_ind,mutac_ind
+from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error, FiltroFIR, plot_FIR
 
 
 
 PUNTUACION_MAXIMA = 20
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 101                      #Generaciones a correr
-pDim = 20                      #Tamaño de la poblacion
+nGen = 201                      #Generaciones a correr
+pDim = 40                      #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
-pCruza=10                        #probabilidad de cruza porcentual
+pCruza = 10                        #probabilidad de cruza porcentual
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 
+# Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
+lim_gamma = [0.75, 5]
+lim_alfa = [0.75, 5]
+lim_sigma = [1, 5]             #Actualmente no se utiliza y el filtro calcula su sigma propio
+lim_Nmax = [60, 60]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
+lim_Nmin = [2, 2]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
+lim_N = [lim_Nmin[0], lim_Nmax[1]]
+
+
+
+
+# Variables auxiliares ----------------------------------------------------------------------------------------------------------------------
 poblacion_actual = []           #Array con la poblacion actual 
 poblacion_nueva = []            #Array donde se van volcando los individuos de la proxima poblacion
 salida_filtro = []              #Array de las salidas del filtro con cada set de parametros
@@ -35,23 +47,15 @@ evol_error = []
 error_max=np.zeros(nGen)               #Evolucion del error en funcion de las generaciones
 error_min=np.zeros(nGen)
 
-# Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
-lim_gamma = [0.75, 5]
-lim_alfa = [0.75, 5]
-lim_sigma = [1, 10]             #Actualmente no se utiliza y el filtro calcula su sigma propio
-lim_Nmax = [40, 40]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
-lim_Nmin = [5, 5]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
-lim_N = [lim_Nmin[0], lim_Nmax[1]]
-
 
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
 amp = [20, 10, 15]              #Amplitudes de cada tono
 per = [200, 350, 170]              #Periodos de cada tono
 fase = [0, 0, 1.5]              #Fases de cada tono
-muestras = 2000                  #Tamaño de la señal total
+muestras = 1000                  #Tamaño de la señal total
 
-amp_noise = 40                   #Amplitud del ruido
+amp_noise = 30                   #Amplitud del ruido
 
 
 
@@ -125,6 +129,10 @@ def score_pob(error_punt, error_maximo):
 
 
 
+
+
+
+# Main -----------------------------------------------------------------------------------------------------------------
 print('Vamos a tomar',nGen,'generaciones')
 poblacion_actual = create_pop(pDim)                 #Creo la poblacion aleatoria
 
@@ -164,7 +172,7 @@ for gen in range(nGen):
             error_maximo = error_actual
             ind_maximo_err = ind
             
-
+    #Para ploteo de errores minimo y maximo
     error_min[gen] = error_minimo
     error_max[gen] = error_maximo
 
@@ -172,13 +180,18 @@ for gen in range(nGen):
     error_promedio_gen = error_promedio_gen / len(poblacion_actual)
     evol_error.append(error_promedio_gen)
 
+    #Genero ploteos de la generacion
     if gen%10 is 0:
-        plot_filtrados(poblacion_actual, datos_orig, salida_filtro, gen)
+        plot_filtrados(poblacion_actual, datos_puros, salida_filtro, ind_minimo_err, ind_maximo_err, gen)
+
+        #Genero la salida del diltro FIR con el mejor individuo de la generacion y las comparo
+        filtrada_FIR = FiltroFIR(poblacion_actual[0,0], datos_orig)
+        plot_FIR(datos_puros, filtrada_FIR, salida_filtro, gen, [400, 800])
+
 
     #Asignacion de puntajes
     score_pob(error_punt, error_maximo)
 
-    #print(poblacion_actual)
     #Seleccion de individuos
     poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
@@ -186,7 +199,7 @@ for gen in range(nGen):
     poblacion_nueva = mate_ind(poblacion_nueva, pCruza)
     
     #mutacion
-    poblacion_actual = mutac_ind(poblacion_nueva,pMuta,dMuta)
+    poblacion_actual = mutac_ind(poblacion_nueva,pMuta,dMuta, lim_Nmax[1], lim_Nmin[0])
 
     #print(poblacion_actual)
 
@@ -196,35 +209,6 @@ for gen in range(nGen):
 #print("Los mejores parametros son " + str(poblacion_actual[0,:]))
 
 
-plt.figure(figsize=(14, 10))
-
-plt.subplot(311)
-plt.plot(datos_orig-80, label='Señal con ruido')
-plt.plot(datos_puros-40, label='Señal sin ruido')
-plt.ylabel('Valor')
-plt.xlabel('Tiempo')
-plt.grid(True)
-plt.legend(loc=4)
-
-plt.subplot(312)
-plt.plot(evol_error, label='Medio generacional')
-plt.plot(error_max, label='Maximo generacional')
-plt.plot(error_min, label='Minimo generacional')
-plt.ylabel('Valor')
-plt.xlabel('Tiempo')
-plt.grid(True)
-plt.legend(loc=1)
-
-
-plt.subplot(313)
-plt.plot(evol_error, label='Medio generacional')
-plt.plot(error_min, label='Error minimo por generacion')
-plt.suptitle('Evolucion del error generacional')
-plt.ylabel('Valor')
-plt.xlabel('Tiempo')
-plt.grid(True)
-plt.legend(loc=1)
-plt.savefig("Evolucion/Error.png")
-plt.close()
+plot_error(evol_error, error_max, error_min, datos_puros, datos_orig)
 
 
