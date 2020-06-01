@@ -134,7 +134,8 @@ def run_test(param, data):
     #deve devolver la curva resultado del filtro
     #este filtro debe recivir el vector de valores de contagio del COVID
 
-    return FiltroDEWMA(param, data)
+    #return FiltroDEWMA(param, data)
+    return FiltroFIR(param[0], data)
 
 
 
