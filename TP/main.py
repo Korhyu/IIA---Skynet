@@ -126,6 +126,8 @@ def score_pob(error_punt, error_maximo):
 
     for ind in range(len(poblacion_actual)):
         error_punt[ind,1]= PUNTUACION_MAXIMA - (error_punt[ind,0] * PUNTUACION_MAXIMA / error_maximo)
+        if  error_punt[ind,1] <1:
+            error_punt[ind,1]=1
 
 
 

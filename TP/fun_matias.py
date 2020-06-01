@@ -34,9 +34,10 @@ def select_ind(poblacion_actual,error_punt):
     for i in range(int(len(prueba[:,0]))):       
         rd=random.randrange(0,100,1)
         pob_sel[i,:]=np.copy(aux[rd,:6])
-        while aux[rd,6]==0:
-            pob_sel[i,:]=np.copy(aux[rd,:6])
+        while aux[rd,6]==0:            
             rd=random.randrange(0,100,1)
+            pob_sel[i,:]=np.copy(aux[rd,:6])
+            print(aux[rd,6])
                             
     print(pob_sel)
     #pob_ord=sorted(poblacion_actual[].score);
@@ -66,10 +67,11 @@ def select_ind(poblacion_actual,error_punt):
     
 def mate_ind(poblacion_nueva,pCruza):
     #Funcion de cruza de la poblacion
+    # print(poblacion_nueva)
     aux = np.arange(6)
     aux_pasa = np.arange(6)
     cant_cruza=0
-    for cruza in range(int(len(poblacion_nueva[:,0]))-1):
+    for cruza in range(int(len(poblacion_nueva[:,0]))):
         #elijo los padres al azar
         if pCruza > (random.randrange(0, 1000, 1))/10:
             #lo separo para cruzar 
@@ -91,7 +93,7 @@ def mate_ind(poblacion_nueva,pCruza):
 
         while i>=2:
             #elijo el punto de quiebre al azar y lo aplico
-            pQuiebre=random.randrange(1, (int(len(poblacion_nueva[0,:]))*5)-1,1)
+            pQuiebre=random.randrange(1, (int(len(poblacion_nueva[0,:]))*5),1)
 
             for pQ in range(math.floor(pQuiebre/5)):
                 aux_cruz[pQ]=aux[i,pQ]
@@ -116,8 +118,8 @@ def mate_ind(poblacion_nueva,pCruza):
             i=i-2
    
     #Debe considerar cuantos "puestos libres" hay en la proxima poblacion para no exceder el numero
-
-    return aux_pasa
+    print(len(aux_pasa[:,0]))
+    return aux_pasa[1:,:]
 
 
 
