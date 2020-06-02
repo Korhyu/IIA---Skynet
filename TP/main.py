@@ -12,15 +12,15 @@ import matplotlib.pyplot as plt
 
 from clases import individuo
 from fun_matias import select_ind, mate_ind,mutac_ind, buscarnegativos
-from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error, FiltroFIR, plot_comparacion, FiltroEWMA
+from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error
+from fun_jose import FiltroFIR, plot_comparacion, FiltroEWMA, plot_best_indN, plot_in_out
 
 
-
-PUNTUACION_MAXIMA = 20
+PUNTUACION_MAXIMA = 10000
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 101                      #Generaciones a correr
-pDim = 40                      #Tamaño de la poblacion
+nGen = 21                      #Generaciones a correr
+pDim = 50                      #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
 pCruza = 10                        #probabilidad de cruza porcentual
@@ -29,10 +29,10 @@ pCruza = 10                        #probabilidad de cruza porcentual
 
 
 # Parametros del DEWMA -------------------------------------------------------------------------------------------------------------------
-lim_gamma = [0.75, 5]
-lim_alfa = [0.75, 5]
-lim_sigma = [1, 5]             #Actualmente no se utiliza y el filtro calcula su sigma propio
-lim_Nmax = [60, 60]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
+lim_gamma = [0.5, 20]
+lim_alfa = [0.5, 20]
+lim_sigma = [0.1, 20]             #Actualmente no se utiliza y el filtro calcula su sigma propio
+lim_Nmax = [200, 200]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
 lim_Nmin = [5, 5]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 lim_N = [lim_Nmin[0], lim_Nmax[1]]
 
@@ -43,7 +43,7 @@ lim_N = [lim_Nmin[0], lim_Nmax[1]]
 poblacion_actual = []           #Array con la poblacion actual 
 poblacion_nueva = []            #Array donde se van volcando los individuos de la proxima poblacion
 salida_filtro = []              #Array de las salidas del filtro con cada set de parametros
-evol_error = []  
+evol_error_medio = []  
 error_max=np.zeros(nGen)               #Evolucion del error en funcion de las generaciones
 error_min=np.zeros(nGen)
 
@@ -51,16 +51,16 @@ error_min=np.zeros(nGen)
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
 amp = [20, 10, 15]              #Amplitudes de cada tono
-per = [400, 700, 430]              #Periodos de cada tono
-fase = [0, 0, 1.5]              #Fases de cada tono
-muestras = 2000                  #Tamaño de la señal total
+per = [400, 250, 530]           #Periodos de cada tono
+fase = [0, 0.78, 1.57]          #Fases de cada tono
+muestras = 2000                 #Tamaño de la señal total
 
-amp_noise = 1                   #Amplitud del ruido
+amp_noise = 2                   #Amplitud del ruido
 
 
 # Parametros de filtros de comparacion ---------------------------------------------------------------------------------------------------
-eq_FIR = 9                  #Valor N del filtro "equivalente" FIR
-eq_EWMA = 9                 #Valor N del filtro "equivalente" EWMA
+eq_FIR = 6                  #Valor N del filtro "equivalente" FIR
+eq_EWMA = 6                 #Valor N del filtro "equivalente" EWMA
 
 
 # Funciones ------------------------------------------------------------------------------------------------------------------------------
@@ -145,13 +145,15 @@ poblacion_actual = create_pop(pDim)                 #Creo la poblacion aleatoria
 datos_puros = gen_signal(amp, per, fase, muestras)  #Genero la señal de prueba
 datos_orig = add_noise(amp_noise, datos_puros)
 
+error_superman = 10000                              #Error del mejor individuo de todas las generaciones
+
 for gen in range(nGen):
     print('Generacion ',gen)
 
     poblacion_nueva = []                                    #Reinicio la poblacion nueva
 
     error_minimo = 10000
-    error_superman = 10000
+    
     error_maximo = 0
     error_promedio_gen = 0
     ind_minimo_err = 0
@@ -180,25 +182,24 @@ for gen in range(nGen):
             ind_maximo_err = ind
             
         #Descubriendo a Superman
-        if error_superman < error_minimo:
+        if error_superman > error_minimo:
             superman = poblacion_actual[ind]                    #Guardo los parametros
             agujero_techo = salida_filtro[ind]                  #Guardo surespuesta al filtro
             crec_superman = Ns                                  #Guardo su evolucion de Ns
             error_superman = error_actual                       #Guardo el error para ver si sigue siendo superman
             
-
-
     #Para ploteo de errores minimo y maximo
     error_min[gen] = error_minimo
     error_max[gen] = error_maximo
 
     #Calculo el error promedio de la generacion
     error_promedio_gen = error_promedio_gen / len(poblacion_actual)
-    evol_error.append(error_promedio_gen)
-
+    evol_error_medio.append(error_promedio_gen)
     
     #Asignacion de puntajes
     score_pob(error_punt, error_maximo)
+
+    #Guardo los parametros del mejor individuo de esta generacion
 
 
     #Genero ploteos de la generacion
@@ -213,7 +214,7 @@ for gen in range(nGen):
         filtrada_DEWMA = salidas_DEWMA[0,0:-2]
         filtrada_FIR = FiltroFIR(eq_FIR, datos_orig)
         filtrada_EWMA = FiltroEWMA(eq_EWMA, datos_orig)
-        plot_comparacion(gen, datos_puros, filtrada_DEWMA, filtrada_FIR, filtrada_EWMA, [400, 1200])
+        plot_comparacion(gen, datos_puros, filtrada_DEWMA, filtrada_FIR, filtrada_EWMA, [800, 1200])
 
 
 
@@ -232,11 +233,15 @@ for gen in range(nGen):
     #print(poblacion_actual)
 
 #Termino y muestro resultados
-#plot_error(evol_error)
+#plot_error(evol_error_medio)
 
 #print("Los mejores parametros son " + str(poblacion_actual[0,:]))
 
+print(superman)
 
-plot_error(evol_error, error_max, error_min, datos_puros, datos_orig)
-
+plot_error(evol_error_medio, error_max, error_min, datos_puros, datos_orig)
+plot_best_indN(datos_puros, crec_superman)
+plot_in_out(datos_orig, agujero_techo,"DEWMA")
+plot_in_out(datos_orig, filtrada_FIR[0],"FIR")
+plot_in_out(datos_orig, filtrada_EWMA[0],"EWMA")
 

@@ -147,12 +147,12 @@ def mutac_ind(oPob,pMuta,dMuta, Nmax, Nmin):
                 if param == 0 :
                     aux[total,param]= round(random.uniform(aux[total,param]*min_muta,aux[total,param]*max_muta))
                 elif param==4 or param==5:
-                    pass
+                    aux[total, 4] = Nmax
+                    aux[total, 5] = Nmin
                 else:
                     aux[total,param]= random.uniform(aux[total,param]*min_muta,aux[total,param]*max_muta)
 
-                aux[total, 4] = Nmax
-                aux[total, 5] = Nmin
+                
                     
     print('Cantidad de parametros mutados', cuenta)
 

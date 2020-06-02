@@ -47,27 +47,51 @@ def gen_signal(amp, per, fases, muestras):
     #if st.min() < 0:
     #    st = st - st.min()
 
-    #plt.plot(s.transpose(), label = "original")
-    #plt.plot(st, label = "suma")
-    #plt.legend()
-    #plt.show()
 
     return st
 
-def add_noise(amp, st):
+def add_noise(amp, s):
     #Agrega ruido aleatorio de amplitud especificada y desplaza la señal completa para no tener valroes negativos
     
-    n = np.random.default_rng().uniform(low=-amp, high=amp, size=len(st))
+    n = np.random.default_rng().uniform(low=-amp, high=amp, size=len(s))
 
-    st = st + n
+    st = s + n
 
     #if st.min() < 0:
     #    st = st - st.min()
     
-    #plt.plot(n, label = "noise")
-    #plt.plot(st, label = "signal")
+    archivo = "Señales/Señal_Pura.png"
+    fig = plt.figure(figsize=(12,10))
+    plt.ylabel('Valor')
+    plt.xlabel('Tiempo')
+    plt.title('Señal Pura')
+    plt.plot(s, 'k', label='Señal Pura')
+    plt.grid(True)
     #plt.legend()
-    #plt.show()
+    plt.savefig(archivo)
+    plt.close()
+
+    archivo = "Señales/Ruido_Puro.png"
+    fig = plt.figure(figsize=(12,10))
+    plt.ylabel('Valor')
+    plt.xlabel('Tiempo')
+    plt.title('Ruido Puro')
+    plt.plot(n, 'k', label='Ruido Puro')
+    plt.grid(True)
+    #plt.legend()
+    plt.savefig(archivo)
+    plt.close()
+
+    archivo = "Señales/Señal.png"
+    fig = plt.figure(figsize=(12,10))
+    plt.ylabel('Valor')
+    plt.xlabel('Tiempo')
+    plt.title('Señal')
+    plt.plot(st, 'k', label='Señal')
+    plt.grid(True)
+    #plt.legend()
+    plt.savefig(archivo)
+    plt.close()
 
     return st
 
@@ -132,7 +156,7 @@ def FiltroFIR(N, variable):
     for j in range(0,len(variable)-N):
         a =FIR[N+j-1] +(variable[j+N]-variable[j])/N
         FIR = np.append( FIR , np.array(a ))
-    return FIR
+    return [FIR, N]
 
 
 def FiltroEWMA(N, variable): 
@@ -142,7 +166,7 @@ def FiltroEWMA(N, variable):
     for j in range(1,len(variable)):
         a = EWMA[j-1] +(variable[j]-EWMA[j-1])/N
         EWMA = np.append( EWMA , np.array(a))
-    return EWMA
+    return [EWMA, N]
 
 
 
@@ -152,7 +176,9 @@ def run_test(param, data):
     #este filtro debe recivir el vector de valores de contagio del COVID
 
     return FiltroDEWMA(param, data)
+    #return FiltroEWMA(param[0], data)
     #return FiltroFIR(param[0], data)
+
 
 
 
@@ -254,12 +280,13 @@ def plot_comparacion(gen, pura, DEWMA, FIR = None, EWMA = None, ran = None):
         EWMA = EWMA[ran[0] : ran[1]]
 
     plt.plot(pura, 'k--', label='Datos sin Ruido')
-    plt.plot(DEWMA, label = "DEWMA")
     if FIR is not None:
         plt.plot(FIR, label = "FIR")
     if EWMA is not None:
         plt.plot(EWMA, label = "EWMA")
+    plt.plot(DEWMA, label = "DEWMA")
 
+    plt.title(titulo)
     plt.legend(loc=4)
     plt.savefig(archivo)
     plt.close()
@@ -296,7 +323,7 @@ def plot_error(evol_error, error_max, error_min, datos_puros, datos_orig):
 
 
     plt.subplot(313)
-    plt.plot(evol_error, label='Medio generacional')
+    #plt.plot(evol_error, label='Error Medio por generacion')
     plt.plot(error_min, label='Error minimo por generacion')
     plt.suptitle('Evolucion del error generacional')
     plt.ylabel('Error')
@@ -305,3 +332,58 @@ def plot_error(evol_error, error_max, error_min, datos_puros, datos_orig):
     plt.legend(loc=1)
     plt.savefig("Evolucion/Error.png")
     plt.close()
+
+
+def plot_best_indN(signal, Ns):
+    '''
+    archivo = "Señales/Ruido_Puro.png"
+    fig = plt.figure(figsize=(12,10))
+    plt.ylabel('N [muestras]')
+    plt.xlabel('Tiempo')
+    plt.title('Evolucion')
+    plt.plot(n, 'k', label='Ruido Puro')
+    
+    #plt.legend()
+    plt.savefig(archivo)
+    plt.close()
+    '''
+
+    archivo = "Evolucion/SupermanNs.png"
+    fig, ax1 = plt.subplots()
+    fig = plt.figure(figsize=(12,10))
+    color = 'tab:red'
+    ax1.set_xlabel('Tiempo')
+    ax1.set_ylabel('N [muestras]', color=color)
+    ax1.plot(Ns, color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+    color = 'tab:blue'
+    ax2.set_ylabel('Señal Entrada', color=color)  # we already handled the x-label with ax1
+    ax2.plot(signal, color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    fig.tight_layout()  # otherwise the right y-label is slightly clipped
+    
+    plt.grid(True)
+    plt.show()
+    #plt.savefig(archivo)
+    plt.close()
+
+
+def plot_in_out(signal, out, filtro):
+
+    titulo = "Señal de entrada y salida del filtro " + str(filtro)
+    archivo = "Señales/In_Out_" + str(filtro) + ".png"
+    fig = plt.figure(figsize=(12,6))
+    plt.ylabel('Valor')
+    plt.xlabel('Tiempo')
+    plt.plot(signal, label = "Entrada")
+    plt.plot(out, label = "Salida")
+    plt.title(titulo)
+    plt.legend(loc=4)
+    plt.savefig(archivo)
+    plt.grid(True)
+    plt.close()
+
