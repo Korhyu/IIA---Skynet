@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 from clases import individuo
 from fun_matias import select_ind, mate_ind,mutac_ind, buscarnegativos
-from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error, FiltroFIR, plot_FIR
+from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error, FiltroFIR, plot_comparacion, FiltroEWMA
 
 
 
@@ -58,6 +58,9 @@ muestras = 2000                  #Tamaño de la señal total
 amp_noise = 1                   #Amplitud del ruido
 
 
+# Parametros de filtros de comparacion ---------------------------------------------------------------------------------------------------
+eq_FIR = 9                  #Valor N del filtro "equivalente" FIR
+eq_EWMA = 9                 #Valor N del filtro "equivalente" EWMA
 
 
 # Funciones ------------------------------------------------------------------------------------------------------------------------------
@@ -148,6 +151,7 @@ for gen in range(nGen):
     poblacion_nueva = []                                    #Reinicio la poblacion nueva
 
     error_minimo = 10000
+    error_superman = 10000
     error_maximo = 0
     error_promedio_gen = 0
     ind_minimo_err = 0
@@ -170,10 +174,20 @@ for gen in range(nGen):
             error_minimo = error_actual
             ind_minimo_err = ind
             error_min[gen]=error_actual
+
         if error_actual > error_maximo:
             error_maximo = error_actual
             ind_maximo_err = ind
             
+        #Descubriendo a Superman
+        if error_superman < error_minimo:
+            superman = poblacion_actual[ind]                    #Guardo los parametros
+            agujero_techo = salida_filtro[ind]                  #Guardo surespuesta al filtro
+            crec_superman = Ns                                  #Guardo su evolucion de Ns
+            error_superman = error_actual                       #Guardo el error para ver si sigue siendo superman
+            
+
+
     #Para ploteo de errores minimo y maximo
     error_min[gen] = error_minimo
     error_max[gen] = error_maximo
@@ -182,17 +196,25 @@ for gen in range(nGen):
     error_promedio_gen = error_promedio_gen / len(poblacion_actual)
     evol_error.append(error_promedio_gen)
 
-    #Genero ploteos de la generacion
-    if gen%10 is 0:
-        plot_filtrados(poblacion_actual, datos_puros, salida_filtro, ind_minimo_err, ind_maximo_err, gen)
-
-        #Genero la salida del diltro FIR con el mejor individuo de la generacion y las comparo
-        filtrada_FIR = FiltroFIR(poblacion_actual[0,0], datos_orig)
-        plot_FIR(datos_puros, filtrada_FIR, salida_filtro, gen, 9, [400, 1200])
-
-
+    
     #Asignacion de puntajes
     score_pob(error_punt, error_maximo)
+
+
+    #Genero ploteos de la generacion
+    if gen%10 is 0:
+        #pobl_punt = np.concatenate((poblacion_actual, error_punt), axis=1)
+        #pobl_punt = pobl_punt[np.argsort(-1*pobl_punt[:,7])]
+        #plot_filtrados(pobl_punt, datos_puros, salida_filtro, gen)
+
+        #Genero la salida del filtro FIR con el mejor individuo de la generacion y las comparo
+        salidas_DEWMA = np.concatenate((salida_filtro, error_punt), axis=1)
+        salidas_DEWMA = np.array(sorted(salidas_DEWMA, key=lambda x :x[-1], reverse=True))
+        filtrada_DEWMA = salidas_DEWMA[0,0:-2]
+        filtrada_FIR = FiltroFIR(eq_FIR, datos_orig)
+        filtrada_EWMA = FiltroEWMA(eq_EWMA, datos_orig)
+        plot_comparacion(gen, datos_puros, filtrada_DEWMA, filtrada_FIR, filtrada_EWMA, [400, 1200])
+
 
 
     #Seleccion de individuos
