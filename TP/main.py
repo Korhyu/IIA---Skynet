@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from clases import individuo
-from fun_matias import select_ind, mate_ind,mutac_ind
+from fun_matias import select_ind, mate_ind,mutac_ind, buscarnegativos
 from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error, FiltroFIR, plot_FIR
 
 
@@ -19,7 +19,7 @@ from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise,
 PUNTUACION_MAXIMA = 20
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 201                      #Generaciones a correr
+nGen = 101                      #Generaciones a correr
 pDim = 40                      #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
@@ -33,7 +33,7 @@ lim_gamma = [0.75, 5]
 lim_alfa = [0.75, 5]
 lim_sigma = [1, 5]             #Actualmente no se utiliza y el filtro calcula su sigma propio
 lim_Nmax = [60, 60]             #Hay que revisar estos limites porque el filtro DEWMA ya hace una estimacion de N usando estos valores
-lim_Nmin = [2, 2]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
+lim_Nmin = [5, 5]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 lim_N = [lim_Nmin[0], lim_Nmax[1]]
 
 
@@ -51,11 +51,11 @@ error_min=np.zeros(nGen)
 
 # Parametros de la señal de prueba -------------------------------------------------------------------------------------------------------
 amp = [20, 10, 15]              #Amplitudes de cada tono
-per = [200, 350, 170]              #Periodos de cada tono
+per = [400, 700, 430]              #Periodos de cada tono
 fase = [0, 0, 1.5]              #Fases de cada tono
-muestras = 1000                  #Tamaño de la señal total
+muestras = 2000                  #Tamaño de la señal total
 
-amp_noise = 30                   #Amplitud del ruido
+amp_noise = 1                   #Amplitud del ruido
 
 
 
@@ -158,7 +158,7 @@ for gen in range(nGen):
     # Evaluo cada individuo y le asigno el error
     for ind in range(len(poblacion_actual)):
         #aplicar  filtro a los tipitos
-        salida_filtro[ind] =  run_test(poblacion_actual[ind], datos_orig)
+        [salida_filtro[ind], Ns] =  run_test(poblacion_actual[ind], datos_orig)
 
 
         #Evaluacion de la salida del filtro
@@ -188,20 +188,24 @@ for gen in range(nGen):
 
         #Genero la salida del diltro FIR con el mejor individuo de la generacion y las comparo
         filtrada_FIR = FiltroFIR(poblacion_actual[0,0], datos_orig)
-        plot_FIR(datos_puros, filtrada_FIR, salida_filtro, gen, [400, 800])
+        plot_FIR(datos_puros, filtrada_FIR, salida_filtro, gen, 9, [400, 1200])
 
 
     #Asignacion de puntajes
     score_pob(error_punt, error_maximo)
 
+
     #Seleccion de individuos
     poblacion_nueva = select_ind(poblacion_actual, error_punt)
     
+
     #cruza    
     poblacion_nueva = mate_ind(poblacion_nueva, pCruza)
     
+
     #mutacion
     poblacion_actual = mutac_ind(poblacion_nueva,pMuta,dMuta, lim_Nmax[1], lim_Nmin[0])
+
 
     #print(poblacion_actual)
 

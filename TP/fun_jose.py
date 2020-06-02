@@ -89,7 +89,7 @@ def FiltroDEWMA(param, data):
     Ns = [N]
     for j in range(1,len(variable)):
         #sigma = 2 * (DEWMA[j-1])**(1/2)
-        sigma = 2 * (abs(DEWMA[j-1]))**(1/2)
+        #sigma = 2 * (abs(DEWMA[j-1]))**(1/2)
         #sigma = sigma / (2 * (DEWMA[j-1])**(1/2))
         error = abs(variable[j]-DEWMA[j-1])
         if error > sigma:
@@ -114,7 +114,13 @@ def FiltroDEWMA(param, data):
     param[2] = alfa
     param[3] = sigma
 
-    return DEWMA
+    #plt.ylabel('Valor')
+    #plt.xlabel('Tiempo')
+    #plt.title('Evol de Ns')
+    #plt.plot(Ns)
+    #plt.show()
+
+    return [DEWMA, Ns]
 
 
 def FiltroFIR(N, variable):
@@ -129,13 +135,24 @@ def FiltroFIR(N, variable):
     return FIR
 
 
+def FiltroEWMA(N, variable): 
+    #Filtro EWMA con N variable
+    N = int(N)
+    EWMA = np.array([variable[0]])
+    for j in range(1,len(variable)):
+        a = EWMA[j-1] +(variable[j]-EWMA[j-1])/N
+        EWMA = np.append( EWMA , np.array(a))
+    return EWMA
+
+
+
 def run_test(param, data):
     #Funcion que corre los 5 parametros recividos como lista en el filtro DEWMA
     #deve devolver la curva resultado del filtro
     #este filtro debe recivir el vector de valores de contagio del COVID
 
-    #return FiltroDEWMA(param, data)
-    return FiltroFIR(param[0], data)
+    return FiltroDEWMA(param, data)
+    #return FiltroFIR(param[0], data)
 
 
 
@@ -143,6 +160,8 @@ def run_test(param, data):
 def plot_filtrados(pobl, orig, filtr, ind_min, ind_max, gen=None):
     #Funcion auxiliar para ploteo de las salidas de toda la poblacion del filtro DEWMA
 
+    #Impresion de todos los individuos de la generacion
+    '''
     archivo = "Evolucion/Gen" + str(gen) + ".png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
@@ -165,9 +184,10 @@ def plot_filtrados(pobl, orig, filtr, ind_min, ind_max, gen=None):
     else:
         plt.savefig(archivo)
         plt.close()
-
+    '''
 
     #Impresion del mejor y peor individuo de la generacion
+    '''
     archivo = "Evolucion/GenWB" + str(gen) + ".png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
@@ -191,9 +211,12 @@ def plot_filtrados(pobl, orig, filtr, ind_min, ind_max, gen=None):
     else:
         plt.savefig(archivo)
         plt.close()
+    '''
+
+    #Ploteo del mejor individuo de la generacion comparando con el FIR y el EWMA
 
 
-def plot_FIR(entrada, salida_FIR, salida_DEWMA, gen, rango = None):
+def plot_FIR(entrada, salida_FIR, salida_DEWMA, gen, N, rango = None):
     #Funcion que plotea la salida del filtro FIR comparandola con la salida DEWMA
 
     if rango is not None:
@@ -204,11 +227,12 @@ def plot_FIR(entrada, salida_FIR, salida_DEWMA, gen, rango = None):
         FIR = salida_FIR
         DEWMA = DEWMA[0,:]
 
+    titulo = 'Comparacion entre FIR y DEWMA a igual N='
     archivo = "Evolucion/Comparacion" + str(gen) + ".png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
     plt.xlabel('Tiempo')
-    plt.title('Comparacion entre FIR y DEWMA a igual N')
+    plt.title(titulo)
     plt.plot(entrada, 'k--', label='Datos sin Ruido')
     plt.plot(FIR, label = "FIR")
     plt.plot(DEWMA, label = "DEWMA")

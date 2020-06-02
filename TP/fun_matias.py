@@ -5,7 +5,11 @@ import matplotlib.pyplot as plt
 import math
 import random
 
-
+def buscarnegativos(matriz):
+    for i in range(len(matriz[0,:])):
+        for j in range(len(matriz[:,0])):
+            if matriz[j,i] < 0:
+                print("DANGER")
 
 def select_ind(poblacion_actual,error_punt):
     #Funcion que toma la poblacion y los errores y puntajes y realiza la seleccion, mientras mas puntos mayor la seleccion de ese individuo
@@ -13,6 +17,7 @@ def select_ind(poblacion_actual,error_punt):
     prueba=np.concatenate((poblacion_actual, error_punt), axis=1)
     prueba=prueba[np.argsort(-1*prueba[:,7])]
     pob_sel=poblacion_actual
+
     suma=0
     aux_s=0
     for individuo in range(int(len(poblacion_actual[:,0]))):
@@ -26,7 +31,8 @@ def select_ind(poblacion_actual,error_punt):
         for i in range(int(prueba[individuo,6])):
             
             if aux_s > 99:
-                print('prueba')
+                #print('prueba')
+                pass
             else:
                 aux[aux_s,:]=np.copy(prueba[individuo,:])
             aux_s=aux_s+1
@@ -37,9 +43,9 @@ def select_ind(poblacion_actual,error_punt):
         while aux[rd,6]==0:            
             rd=random.randrange(0,100,1)
             pob_sel[i,:]=np.copy(aux[rd,:6])
-            print(aux[rd,6])
+            #print(aux[rd,6])
                             
-    print(pob_sel)
+    #print(pob_sel)
     #pob_ord=sorted(poblacion_actual[].score);
     # pob_ord=sorted(poblacion_actual, key=lambda individuo : individuo.score, reverse=True)
  #    #reparto los numeros y genero una nueva lista con los selecionados
@@ -99,7 +105,7 @@ def mate_ind(poblacion_nueva,pCruza):
                 aux_cruz[pQ]=aux[i,pQ]
             if pQuiebre%5 != 0:
                 frac_pQuiebre=pQuiebre%5
-                aux_cruz[math.floor(pQuiebre/5)]=((aux[i,math.floor(pQuiebre/5)]*frac_pQuiebre)+(aux[i-1,math.floor(pQuiebre/5)]*(5-frac_pQuiebre)))/5
+                aux_cruz[math.floor(pQuiebre/5)]=aux[i,math.floor(pQuiebre/5)]#((aux[i,math.floor(pQuiebre/5)]frac_pQuiebre)+(aux[i-1,math.floor(pQuiebre/5)](5-frac_pQuiebre)))/5
             for pQ in range(math.ceil(pQuiebre/5),6):
                  aux_cruz[pQ]=aux[i-1,pQ] 
 
@@ -109,7 +115,8 @@ def mate_ind(poblacion_nueva,pCruza):
                 aux_cruz[pQ]=aux[i-1,pQ]
             if pQuiebre%5 != 0:
                 frac_pQuiebre=pQuiebre-math.floor(pQuiebre/5)
-                aux_cruz[math.floor(pQuiebre/5)]=((aux[i-1,math.floor(pQuiebre/5)]*frac_pQuiebre)+(aux[i,math.floor(pQuiebre/5)]*(5-frac_pQuiebre)))/5
+                aux_cruz[math.floor(pQuiebre/5)]=aux[i-1,math.floor(pQuiebre/5)]
+                #aux_cruz[math.floor(pQuiebre/5)]=((aux[i-1,math.floor(pQuiebre/5)]frac_pQuiebre)+(aux[i,math.floor(pQuiebre/5)](5-frac_pQuiebre)))/5
             for pQ in range(math.ceil(pQuiebre/5),6):
                  aux_cruz[pQ]=aux[i,pQ]
 
@@ -118,7 +125,7 @@ def mate_ind(poblacion_nueva,pCruza):
             i=i-2
    
     #Debe considerar cuantos "puestos libres" hay en la proxima poblacion para no exceder el numero
-    print(len(aux_pasa[:,0]))
+    #print(len(aux_pasa[:,0]))
     return aux_pasa[1:,:]
 
 
