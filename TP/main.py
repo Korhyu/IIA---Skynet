@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import statistics
 
-from clases import individuo
+
 from fun_GA import select_ind, mate_ind,mutac_ind, buscarnegativos
 from fun_sys import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error
 from fun_sys import FiltroFIR, plot_comparacion, FiltroEWMA, plot_best_indN, plot_in_out, save_ind
@@ -20,7 +20,7 @@ from fun_sys import FiltroFIR, plot_comparacion, FiltroEWMA, plot_best_indN, plo
 PUNTUACION_MAXIMA = 10000
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 201                      #Generaciones a correr
+nGen = 201                     #Generaciones a correr
 pDim = 40                      #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %

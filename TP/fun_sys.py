@@ -1,4 +1,4 @@
-from clases import individuo
+
 import numpy as np
 import random
 import csv
@@ -391,3 +391,5 @@ def save_ind(ind):
 
     with open("ind.txt", "a") as file:
         file.write(str(ind))
+        file.write('\n')
+        
