@@ -9,18 +9,19 @@ Created on Sat May 23 12:36:53 2020
 import random as rd
 import numpy as np
 import matplotlib.pyplot as plt
+import statistics
 
 from clases import individuo
-from fun_matias import select_ind, mate_ind,mutac_ind, buscarnegativos
-from fun_jose import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error
-from fun_jose import FiltroFIR, plot_comparacion, FiltroEWMA, plot_best_indN, plot_in_out
+from fun_GA import select_ind, mate_ind,mutac_ind, buscarnegativos
+from fun_sys import run_test, plot_filtrados, load_data, gen_signal, add_noise, plot_error
+from fun_sys import FiltroFIR, plot_comparacion, FiltroEWMA, plot_best_indN, plot_in_out, save_ind
 
 
 PUNTUACION_MAXIMA = 10000
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 21                      #Generaciones a correr
-pDim = 50                      #Tamaño de la poblacion
+nGen = 201                      #Generaciones a correr
+pDim = 40                      #Tamaño de la poblacion
 pMuta = 5                       #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                      #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
 pCruza = 10                        #probabilidad de cruza porcentual
@@ -214,7 +215,7 @@ for gen in range(nGen):
         filtrada_DEWMA = salidas_DEWMA[0,0:-2]
         filtrada_FIR = FiltroFIR(eq_FIR, datos_orig)
         filtrada_EWMA = FiltroEWMA(eq_EWMA, datos_orig)
-        plot_comparacion(gen, datos_puros, filtrada_DEWMA, filtrada_FIR, filtrada_EWMA, [800, 1200])
+        plot_comparacion(gen, datos_puros, filtrada_DEWMA, filtrada_FIR[0], filtrada_EWMA[0], [800, 1200])
 
 
 
@@ -236,12 +237,14 @@ for gen in range(nGen):
 #plot_error(evol_error_medio)
 
 #print("Los mejores parametros son " + str(poblacion_actual[0,:]))
-
-print(superman)
-
+sigma_in=statistics.stdev(np.subtract(datos_orig,datos_puros))
+                          
+ 
 plot_error(evol_error_medio, error_max, error_min, datos_puros, datos_orig)
 plot_best_indN(datos_puros, crec_superman)
 plot_in_out(datos_orig, agujero_techo,"DEWMA")
 plot_in_out(datos_orig, filtrada_FIR[0],"FIR")
 plot_in_out(datos_orig, filtrada_EWMA[0],"EWMA")
 
+save_ind(superman)
+print(superman)

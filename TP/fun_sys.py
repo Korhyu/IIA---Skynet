@@ -387,3 +387,7 @@ def plot_in_out(signal, out, filtro):
     plt.grid(True)
     plt.close()
 
+def save_ind(ind):
+
+    with open("ind.txt", "a") as file:
+        file.write(str(ind))
