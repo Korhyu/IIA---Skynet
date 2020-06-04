@@ -5,6 +5,7 @@ import csv
 import math
 import matplotlib.pyplot as plt
 
+
 pais = "ar"
 
 
@@ -63,7 +64,7 @@ def add_noise(amp, s):
     archivo = "Señales/Señal_Pura.png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
-    plt.xlabel('Tiempo')
+    plt.xlabel('Muestras')
     plt.title('Señal Pura')
     plt.plot(s, 'k', label='Señal Pura')
     plt.grid(True)
@@ -74,7 +75,7 @@ def add_noise(amp, s):
     archivo = "Señales/Ruido_Puro.png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
-    plt.xlabel('Tiempo')
+    plt.xlabel('Muestras')
     plt.title('Ruido Puro')
     plt.plot(n, 'k', label='Ruido Puro')
     plt.grid(True)
@@ -85,7 +86,7 @@ def add_noise(amp, s):
     archivo = "Señales/Señal.png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
-    plt.xlabel('Tiempo')
+    plt.xlabel('Muestras')
     plt.title('Señal')
     plt.plot(st, 'k', label='Señal')
     plt.grid(True)
@@ -96,7 +97,7 @@ def add_noise(amp, s):
     return st
 
 
-def FiltroDEWMA(param, data):
+def FiltrodEWMA(param, data):
     '''Variable: Array a calcular, N: factor de aprendizaje, gama: Velocidad de adaptacion, alfa: Coeficiente de estabilizacion, Nmax y Nmin valores limite para N'''
 
     N = param[0]
@@ -109,13 +110,13 @@ def FiltroDEWMA(param, data):
     variable = data
 
 
-    DEWMA = np.array([variable[0]])
+    dEWMA = np.array([variable[0]])
     Ns = [N]
     for j in range(1,len(variable)):
-        #sigma = 2 * (DEWMA[j-1])**(1/2)
-        #sigma = 2 * (abs(DEWMA[j-1]))**(1/2)
-        #sigma = sigma / (2 * (DEWMA[j-1])**(1/2))
-        error = abs(variable[j]-DEWMA[j-1])
+        #sigma = 2 * (dEWMA[j-1])**(1/2)
+        #sigma = 2 * (abs(dEWMA[j-1]))**(1/2)
+        #sigma = sigma / (2 * (dEWMA[j-1])**(1/2))
+        error = abs(variable[j]-dEWMA[j-1])
         if error > sigma:
             N = round(N/gama)
             if N < Nmin:
@@ -129,8 +130,8 @@ def FiltroDEWMA(param, data):
         elif N > Nmax:
             N = Nmax
         Ns.append(N)
-        a = DEWMA[j-1] +(variable[j]-DEWMA[j-1])/N
-        DEWMA = np.append( DEWMA , np.array(a))
+        a = dEWMA[j-1] +(variable[j]-dEWMA[j-1])/N
+        dEWMA = np.append( dEWMA , np.array(a))
 
 
     param[0] = N
@@ -139,12 +140,12 @@ def FiltroDEWMA(param, data):
     param[3] = sigma
 
     #plt.ylabel('Valor')
-    #plt.xlabel('Tiempo')
+    #plt.xlabel('Muestras')
     #plt.title('Evol de Ns')
     #plt.plot(Ns)
     #plt.show()
 
-    return [DEWMA, Ns]
+    return [dEWMA, Ns]
 
 
 def FiltroFIR(N, variable):
@@ -171,11 +172,11 @@ def FiltroEWMA(N, variable):
 
 
 def run_test(param, data):
-    #Funcion que corre los 5 parametros recividos como lista en el filtro DEWMA
+    #Funcion que corre los 5 parametros recividos como lista en el filtro dEWMA
     #deve devolver la curva resultado del filtro
     #este filtro debe recivir el vector de valores de contagio del COVID
 
-    return FiltroDEWMA(param, data)
+    return FiltrodEWMA(param, data)
     #return FiltroEWMA(param[0], data)
     #return FiltroFIR(param[0], data)
 
@@ -184,13 +185,13 @@ def run_test(param, data):
 
 
 def plot_filtrados(pobl, orig, filtr, gen=None):
-    #Funcion auxiliar para ploteo de las salidas de toda la poblacion del filtro DEWMA
+    #Funcion auxiliar para ploteo de las salidas de toda la poblacion del filtro dEWMA
 
     #Impresion de todos los individuos de la generacion
     archivo = "Evolucion/Gen" + str(gen) + ".png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
-    plt.xlabel('Tiempo')
+    plt.xlabel('Muestras')
     plt.title('Resultados de Generacion')
 
     plt.plot(orig, 'k--', label='Datos sin Ruido')
@@ -216,7 +217,7 @@ def plot_filtrados(pobl, orig, filtr, gen=None):
     archivo = "Evolucion/GenWB" + str(gen) + ".png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
-    plt.xlabel('Tiempo')
+    plt.xlabel('Muestras')
     plt.title('Resultados Peor y Mejor de la Generacion')
     plt.plot(orig, 'k--', label='Datos sin Ruido')
 
@@ -240,42 +241,42 @@ def plot_filtrados(pobl, orig, filtr, gen=None):
     #Ploteo del mejor individuo de la generacion comparando con el FIR y el EWMA
     pass
 
-def plot_FIR(entrada, salida_FIR, salida_DEWMA, gen, N, rango = None):
-    #Funcion que plotea la salida del filtro FIR comparandola con la salida DEWMA
+def plot_FIR(entrada, salida_FIR, salida_dEWMA, gen, N, rango = None):
+    #Funcion que plotea la salida del filtro FIR comparandola con la salida dEWMA
 
     if rango is not None:
         FIR = salida_FIR[rango[0]:rango[1]]
-        DEWMA = salida_DEWMA[0, rango[0]: rango[1]]
+        dEWMA = salida_dEWMA[0, rango[0]: rango[1]]
         entrada = entrada[rango[0]:rango[1]]
     else:
         FIR = salida_FIR
-        DEWMA = DEWMA[0,:]
+        dEWMA = dEWMA[0,:]
 
-    titulo = 'Comparacion entre FIR y DEWMA a igual N='
+    titulo = 'Comparacion entre FIR y dEWMA a igual N='
     archivo = "Evolucion/Comparacion" + str(gen) + ".png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
-    plt.xlabel('Tiempo')
+    plt.xlabel('Muestras')
     plt.title(titulo)
     plt.plot(entrada, 'k--', label='Datos sin Ruido')
     plt.plot(FIR, label = "FIR")
-    plt.plot(DEWMA, label = "DEWMA")
+    plt.plot(dEWMA, label = "dEWMA")
     plt.legend(loc=4)
     plt.savefig(archivo)
     plt.close()
 
     
-def plot_comparacion(gen, pura, DEWMA, FIR = None, EWMA = None, ran = None):
+def plot_comparacion(gen, num, pura, dEWMA, FIR = None, EWMA = None, ran = None):
     #Ploteo las salidas de los filtros recibidos
     titulo = 'Comparacion entre filtros - Gen' + str(gen)
-    archivo = "Evolucion/Comparacion" + str(gen) + ".png"
+    archivo = "Evolucion/Comparacion" + str(num) + "-"  + str(gen) + ".png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('Valor')
-    plt.xlabel('Tiempo')
+    plt.xlabel('Muestras')
     
     if ran is not None:
         pura = pura[ran[0] : ran[1]]
-        DEWMA = DEWMA[ran[0] : ran[1]]
+        dEWMA = dEWMA[ran[0] : ran[1]]
         FIR = FIR[ran[0] : ran[1]]
         EWMA = EWMA[ran[0] : ran[1]]
 
@@ -284,47 +285,61 @@ def plot_comparacion(gen, pura, DEWMA, FIR = None, EWMA = None, ran = None):
         plt.plot(FIR, label = "FIR")
     if EWMA is not None:
         plt.plot(EWMA, label = "EWMA")
-    plt.plot(DEWMA, label = "DEWMA")
+    plt.plot(dEWMA, label = "dEWMA")
 
     plt.title(titulo)
     plt.legend(loc=4)
     plt.savefig(archivo)
     plt.close()
 
+
     
 
 
 
 def plot_Ns():
-    #Funcion de ploteo de la evolucion del Ns de un DEWMA y la señal de entrada al mismo
+    #Funcion de ploteo de la evolucion del Ns de un dEWMA y la señal de entrada al mismo
 
     pass
 
-def plot_error(evol_error, error_max, error_min, datos_puros, datos_orig):
+def plot_error(evol_error, error_max, error_min, datos_puros, datos_orig, error_super, cte_FIR, cte_EWMA):
     #Funcion que genera el ploteo de la evolucion del error
     plt.figure(figsize=(14, 10))
 
+
     plt.subplot(311)
-    plt.plot(datos_orig, label='Señal con ruido')
-    plt.plot(datos_puros, label='Señal sin ruido')
-    plt.ylabel('Valor')
-    plt.xlabel('Tiempo')
+    plt.plot(evol_error[0:99], label='Medio generacional')
+    plt.plot(error_min[0:99], label='Minimo generacional')
+    plt.ylabel('Error')
+    plt.xlabel('Generacion')
     plt.grid(True)
     plt.legend(loc=4)
 
+    
+    
     plt.subplot(312)
-    plt.plot(evol_error, label='Medio generacional')
-    plt.plot(error_max, label='Maximo generacional')
-    plt.plot(error_min, label='Minimo generacional')
+
+    error_FIR = np.zeros(len(error_min[0:99]))
+    error_EWMA = np.zeros(len(error_min[0:99]))
+    for i in range(len(error_min[0:99])):
+        error_FIR[i] = cte_FIR
+        error_EWMA[i] = cte_EWMA
+
+    
+    #plt.plot(error_max, label='Maximo generacional')
+    plt.plot(error_min[0:99], label='Minimo generacional')
+    plt.plot(error_FIR[0:99], label='Filtro FIR')
+    plt.plot(error_EWMA[0:99], label='Filtro EWMA')
     plt.ylabel('Error')
     plt.xlabel('Generacion')
     plt.grid(True)
     plt.legend(loc=1)
+    
 
-
-    plt.subplot(313)
+    plt.subplot(313) 
     #plt.plot(evol_error, label='Error Medio por generacion')
-    plt.plot(error_min, label='Error minimo por generacion')
+    plt.plot(error_min[0:99], label='Minimo generacional')
+    plt.plot(error_super[0:99], label='Minimo minimorum')
     plt.suptitle('Evolucion del error generacional')
     plt.ylabel('Error')
     plt.xlabel('Generacion')
@@ -334,12 +349,26 @@ def plot_error(evol_error, error_max, error_min, datos_puros, datos_orig):
     plt.close()
 
 
+
+    plt.figure(figsize=(14, 10))
+    plt.plot(error_min, label='Minimo generacional')
+    plt.suptitle('Evolucion del error generacional')
+    plt.ylabel('Error')
+    plt.xlabel('Generacion')
+
+
+    plt.grid(True)
+    plt.legend(loc=1)
+    plt.savefig("Evolucion/Error100.png")
+    plt.close()
+
+
 def plot_best_indN(signal, Ns):
     '''
     archivo = "Señales/Ruido_Puro.png"
     fig = plt.figure(figsize=(12,10))
     plt.ylabel('N [muestras]')
-    plt.xlabel('Tiempo')
+    plt.xlabel('Muestras')
     plt.title('Evolucion')
     plt.plot(n, 'k', label='Ruido Puro')
     
@@ -352,7 +381,7 @@ def plot_best_indN(signal, Ns):
     fig, ax1 = plt.subplots()
     fig = plt.figure(figsize=(12,10))
     color = 'tab:red'
-    ax1.set_xlabel('Tiempo')
+    ax1.set_xlabel('Muestras')
     ax1.set_ylabel('N [muestras]', color=color)
     ax1.plot(Ns, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
@@ -378,7 +407,7 @@ def plot_in_out(signal, out, filtro):
     archivo = "Señales/In_Out_" + str(filtro) + ".png"
     fig = plt.figure(figsize=(12,6))
     plt.ylabel('Valor')
-    plt.xlabel('Tiempo')
+    plt.xlabel('Muestras')
     plt.plot(signal, label = "Entrada")
     plt.plot(out, label = "Salida")
     plt.title(titulo)
@@ -386,6 +415,8 @@ def plot_in_out(signal, out, filtro):
     plt.savefig(archivo)
     plt.grid(True)
     plt.close()
+
+
 
 def save_ind(ind):
 
