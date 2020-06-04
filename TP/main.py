@@ -20,8 +20,8 @@ from fun_sys import FiltroFIR, plot_comparacion, FiltroEWMA, plot_best_indN, plo
 PUNTUACION_MAXIMA = 10000
 
 # Parametros del GA ----------------------------------------------------------------------------------------------------------------------
-nGen = 201                     #Generaciones a correr
-pDim = 40                     #Tamaño de la poblacion
+nGen = 61                    #Generaciones a correr
+pDim = 120                     #Tamaño de la poblacion
 pMuta = 3                     #Probabilidad de que un individuo mute expresade en %
 dMuta = 50                    #delta de Muta, osea cuanto puede variar en la mutacion expresado en %
 pCruza = 40                   #probabilidad de cruza porcentual
@@ -32,7 +32,7 @@ pCruza = 40                   #probabilidad de cruza porcentual
 # Parametros del dEWMA -------------------------------------------------------------------------------------------------------------------
 lim_gamma = [0.5, 40]
 lim_alfa = [1, 30]
-lim_sigma = [0.01, 5]             #Actualmente no se utiliza y el filtro calcula su sigma propio
+lim_sigma = [4, 8]             #Actualmente no se utiliza y el filtro calcula su sigma propio
 lim_Nmax = [200, 200]             #Hay que revisar estos limites porque el filtro dEWMA ya hace una estimacion de N usando estos valores
 lim_Nmin = [5, 5]              #Quiza estos parametros hay que incluirlos en los limites de arriba, para pensar
 lim_N = [lim_Nmin[0], lim_Nmax[1]]
@@ -56,12 +56,12 @@ per = [400, 250, 530]           #Periodos de cada tono
 fase = [0, 0.78, 1.57]          #Fases de cada tono
 muestras = 2000                 #Tamaño de la señal total
 
-amp_noise = 2                   #Amplitud del ruido
+amp_noise = 6                  #Amplitud del ruido
 
 
 # Parametros de filtros de comparacion ---------------------------------------------------------------------------------------------------
-eq_FIR = 12                 #Valor N del filtro "equivalente" FIR
-eq_EWMA = 12                #Valor N del filtro "equivalente" EWMA
+eq_FIR = 6                 #Valor N del filtro "equivalente" FIR
+eq_EWMA = 6                #Valor N del filtro "equivalente" EWMA
 
 
 # Funciones ------------------------------------------------------------------------------------------------------------------------------
@@ -137,127 +137,131 @@ def score_pob(error_punt, error_maximo):
 
 
 
-
-# Main -----------------------------------------------------------------------------------------------------------------
-print('Vamos a tomar',nGen,'generaciones')
-poblacion_actual = create_pop(pDim)                 #Creo la poblacion aleatoria
-
-#datos_orig = load_data()                           #Obtengo los datos de contagio
-datos_puros = gen_signal(amp, per, fase, muestras)  #Genero la señal de prueba
-datos_orig = add_noise(amp_noise, datos_puros)
-
-error_superman = 10000                              #Error del mejor individuo de todas las generaciones
-
-
-filtrada_FIR = FiltroFIR(eq_FIR, datos_orig)        #Filtradas de comparacion
-filtrada_EWMA = FiltroEWMA(eq_EWMA, datos_orig)
-
-for gen in range(nGen):
-    print('Generacion ',gen)
-
-    poblacion_nueva = []                                    #Reinicio la poblacion nueva
-
-    error_minimo = 10000
+for asd in range(20):
+    # Main -----------------------------------------------------------------------------------------------------------------
+    print('Vamos a tomar',nGen,'generaciones')
+    poblacion_actual = create_pop(pDim)                 #Creo la poblacion aleatoria
     
-    error_maximo = 0
-    error_promedio_gen = 0
-    ind_minimo_err = 0
-    ind_maximo_err = 0
-    error_punt = np.empty([len(poblacion_actual), 2])      #Vector de errores y puntaje de cada individuo
-    salida_filtro = np.empty([len(poblacion_actual), len(datos_orig)]) 
-
-    # Evaluo cada individuo y le asigno el error
-    for ind in range(len(poblacion_actual)):
-        #aplicar  filtro a los tipitos
-        [salida_filtro[ind], Ns] =  run_test(poblacion_actual[ind], datos_orig)
-
-
-        #Evaluacion de la salida del filtro
-        error_actual = eval_test(datos_puros, salida_filtro[ind,:])
-        error_punt[ind,0] = error_actual                                    #Cargo el error en el numpy
-        error_promedio_gen = error_promedio_gen + error_actual
-
-        if error_actual < error_minimo:
-            error_minimo = error_actual
-            ind_minimo_err = ind
-            error_min[gen]=error_actual
-
-        if error_actual > error_maximo:
-            error_maximo = error_actual
-            ind_maximo_err = ind
-            
-        #Descubriendo a Superman
-        if error_superman > error_minimo:
-            superman = poblacion_actual[ind]                    #Guardo los parametros
-            agujero_techo = salida_filtro[ind]                  #Guardo surespuesta al filtro
-            crec_superman = Ns                                  #Guardo su evolucion de Ns
-            error_superman = error_actual                       #Guardo el error para ver si sigue siendo superman
-            
-    #Para ploteo de errores minimo y maximo
-    error_min[gen] = error_minimo
-    error_max[gen] = error_maximo
-    error_minomorum[gen] = error_superman
-
-    #Calculo el error promedio de la generacion
-    error_promedio_gen = error_promedio_gen / len(poblacion_actual)
-    evol_error_medio.append(error_promedio_gen)
+    #datos_orig = load_data()                           #Obtengo los datos de contagio
+    datos_puros = gen_signal(amp, per, fase, muestras)  #Genero la señal de prueba
+    datos_orig = add_noise(amp_noise, datos_puros)
     
-    #Asignacion de puntajes
-    score_pob(error_punt, error_maximo)
-
-    #Guardo los parametros del mejor individuo de esta generacion
-
-
-    #Genero ploteos de la generacion
-    if gen % (nGen/2) is 0:
-        #pobl_punt = np.concatenate((poblacion_actual, error_punt), axis=1)
-        #pobl_punt = pobl_punt[np.argsort(-1*pobl_punt[:,7])]
-        #plot_filtrados(pobl_punt, datos_puros, salida_filtro, gen)
-
-        #Genero la salida del filtro FIR con el mejor individuo de la generacion y las comparo
-        salidas_dEWMA = np.concatenate((salida_filtro, error_punt), axis=1)
-        salidas_dEWMA = np.array(sorted(salidas_dEWMA, key=lambda x :x[-1], reverse=True))
-        filtrada_dEWMA = salidas_dEWMA[0,0:-2]
+    error_superman = 10000                              #Error del mejor individuo de todas las generaciones
+    
+    
+    filtrada_FIR = FiltroFIR(eq_FIR, datos_orig)        #Filtradas de comparacion
+    filtrada_EWMA = FiltroEWMA(eq_EWMA, datos_orig)
+    
+    for gen in range(nGen):
+        print('Generacion ',gen)
+    
+        poblacion_nueva = []                                    #Reinicio la poblacion nueva
+    
+        error_minimo = 10000
         
-        plot_comparacion(gen, 1, datos_puros, filtrada_dEWMA, filtrada_FIR[0], filtrada_EWMA[0], [800, 1200])
-        plot_comparacion(gen, 2, datos_puros, filtrada_dEWMA, filtrada_FIR[0], filtrada_EWMA[0], [800, 900])
-        plot_comparacion(gen, 3, datos_orig, filtrada_dEWMA, filtrada_FIR[0], filtrada_EWMA[0], [800, 900])
-
-
-
-    #Seleccion de individuos
-    poblacion_nueva = select_ind(poblacion_actual, error_punt)
+        error_maximo = 0
+        error_promedio_gen = 0
+        ind_minimo_err = 0
+        ind_maximo_err = 0
+        error_punt = np.empty([len(poblacion_actual), 2])      #Vector de errores y puntaje de cada individuo
+        salida_filtro = np.empty([len(poblacion_actual), len(datos_orig)]) 
     
-
-    #cruza    
-    poblacion_nueva = mate_ind(poblacion_nueva, pCruza)
+        # Evaluo cada individuo y le asigno el error
+        for ind in range(len(poblacion_actual)):
+            #aplicar  filtro a los tipitos
+            [salida_filtro[ind], Ns] =  run_test(poblacion_actual[ind], datos_orig)
     
+    
+            #Evaluacion de la salida del filtro
+            error_actual = eval_test(datos_puros, salida_filtro[ind,:])
+            error_punt[ind,0] = error_actual                                    #Cargo el error en el numpy
+            error_promedio_gen = error_promedio_gen + error_actual
+    
+            if error_actual < error_minimo:
+                error_minimo = error_actual
+                ind_minimo_err = ind
+                error_min[gen]=error_actual
+    
+            if error_actual > error_maximo:
+                error_maximo = error_actual
+                ind_maximo_err = ind
+                
+            #Descubriendo a Superman
+            if error_superman > error_minimo:
+                superman = poblacion_actual[ind]                    #Guardo los parametros
+                agujero_techo = salida_filtro[ind]                  #Guardo surespuesta al filtro
+                crec_superman = Ns                                  #Guardo su evolucion de Ns
+                error_superman = error_actual                       #Guardo el error para ver si sigue siendo superman
+                
+        #Para ploteo de errores minimo y maximo
+        error_min[gen] = error_minimo
+        error_max[gen] = error_maximo
+        error_minomorum[gen] = error_superman
+    
+        #Calculo el error promedio de la generacion
+        error_promedio_gen = error_promedio_gen / len(poblacion_actual)
+        evol_error_medio.append(error_promedio_gen)
+        
+        #Asignacion de puntajes
+        score_pob(error_punt, error_maximo)
+    
+        #Guardo los parametros del mejor individuo de esta generacion
+    
+    
+        #Genero ploteos de la generacion
+        if gen % (int(nGen)/2) is 0:
+            #pobl_punt = np.concatenate((poblacion_actual, error_punt), axis=1)
+            #pobl_punt = pobl_punt[np.argsort(-1*pobl_punt[:,7])]
+            #plot_filtrados(pobl_punt, datos_puros, salida_filtro, gen)
+    
+            #Genero la salida del filtro FIR con el mejor individuo de la generacion y las comparo
+            salidas_dEWMA = np.concatenate((salida_filtro, error_punt), axis=1)
+            salidas_dEWMA = np.array(sorted(salidas_dEWMA, key=lambda x :x[-1], reverse=True))
+            filtrada_dEWMA = salidas_dEWMA[0,0:-2]
+            
+            plot_comparacion(gen, 1, datos_puros, filtrada_dEWMA, filtrada_FIR[0], filtrada_EWMA[0], [800, 1200])
+            plot_comparacion(gen, 2, datos_puros, filtrada_dEWMA, filtrada_FIR[0], filtrada_EWMA[0], [800, 900])
+            plot_comparacion(gen, 3, datos_orig, filtrada_dEWMA, filtrada_FIR[0], filtrada_EWMA[0], [800, 900])
+    
+    
+    
+        #Seleccion de individuos
+        poblacion_nueva = select_ind(poblacion_actual, error_punt)
+        
+    
+        #cruza    
+        poblacion_nueva = mate_ind(poblacion_nueva, pCruza)
+        
+    
+        #mutacion
+        poblacion_actual = mutac_ind(poblacion_nueva, pMuta, dMuta, lim_Nmax[1], lim_Nmin[0])
+    
+    
+        #print(poblacion_actual)
+    
+    #Termino y muestro resultados
+    #plot_error(evol_error_medio)
+    
+    #print("Los mejores parametros son " + str(poblacion_actual[0,:]))
+    sigma_in=statistics.stdev(np.subtract(datos_orig,datos_puros))
+    
+    error_FIR = eval_test(datos_puros, filtrada_FIR[0])           
+    error_EWMA = eval_test(datos_puros, filtrada_EWMA[0]) 
+    
+    plot_error(evol_error_medio, error_max, error_min, datos_puros, datos_orig, error_minomorum, error_FIR, error_EWMA)
+    plot_best_indN(datos_puros, crec_superman)
+    plot_in_out(datos_orig, agujero_techo,"dEWMA")
+    plot_in_out(datos_orig, filtrada_FIR[0],"FIR")
+    plot_in_out(datos_orig, filtrada_EWMA[0],"EWMA")
+    
+    save_ind(superman)
+    print("Superman")
+    print(str(superman))
+    
+    print(str(error_FIR))
+    print(str(error_EWMA))
+    # print(str(error_EWMA[1]))
+    # final = [error_FIR , error_EWMA, error_EWMA[-1]]
+    # print("Error cuadratico - FIR - EWMA - dEWMA")
+    # print(str(final))
 
-    #mutacion
-    poblacion_actual = mutac_ind(poblacion_nueva, pMuta, dMuta, lim_Nmax[1], lim_Nmin[0])
-
-
-    #print(poblacion_actual)
-
-#Termino y muestro resultados
-#plot_error(evol_error_medio)
-
-#print("Los mejores parametros son " + str(poblacion_actual[0,:]))
-sigma_in=statistics.stdev(np.subtract(datos_orig,datos_puros))
-
-error_FIR = eval_test(datos_puros, filtrada_FIR[0])           
-error_EWMA = eval_test(datos_puros, filtrada_EWMA[0]) 
-
-plot_error(evol_error_medio, error_max, error_min, datos_puros, datos_orig, error_minomorum, error_FIR, error_EWMA)
-plot_best_indN(datos_puros, crec_superman)
-plot_in_out(datos_orig, agujero_techo,"dEWMA")
-plot_in_out(datos_orig, filtrada_FIR[0],"FIR")
-plot_in_out(datos_orig, filtrada_EWMA[0],"EWMA")
-
-save_ind(superman)
-print("Superman")
-print(str(superman))
-
-final = [error_FIR , error_EWMA, error_EWMA[-1]]
-print("Error cuadratico - FIR - EWMA - dEWMA")
-print(str(final))

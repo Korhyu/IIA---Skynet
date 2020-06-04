@@ -38,7 +38,7 @@ def gen_signal(amp, per, fases, muestras):
 
     for i in range(len(amp)):
         for j in range(muestras):
-            s[i,j] = amp[i] * math.sin(2 * math.pi * j / per[i])
+            s[i,j] = amp[i] * math.sin((2 * math.pi * j / per[i]) + fases[i])
 
     st = np.empty(muestras) 
     for j in range(muestras):
