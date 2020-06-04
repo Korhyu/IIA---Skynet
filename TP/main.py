@@ -209,7 +209,7 @@ for gen in range(nGen):
 
 
     #Genero ploteos de la generacion
-    if gen%20 is 0:
+    if gen % (nGen/2) is 0:
         #pobl_punt = np.concatenate((poblacion_actual, error_punt), axis=1)
         #pobl_punt = pobl_punt[np.argsort(-1*pobl_punt[:,7])]
         #plot_filtrados(pobl_punt, datos_puros, salida_filtro, gen)
